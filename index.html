@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<style>
+  html { background: #F7F2EA; }
+  body { margin: 0; background: #F7F2EA; color: #332D27; font-family: Manrope, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: #8A6524; text-decoration: none; }
+  a:hover { color: #332D27; }
+  input, textarea, button { font-family: inherit; }
+  input:focus, textarea:focus { outline: none; }
+  ::placeholder { color: rgba(74,65,57,0.3); }
+  @keyframes grainShift {
+    0% { transform: translate3d(0,0,0); }
+    25% { transform: translate3d(-2%,1%,0); }
+    50% { transform: translate3d(1%,-2%,0); }
+    75% { transform: translate3d(-1%,-1%,0); }
+    100% { transform: translate3d(0,0,0); }
+  }
+  @keyframes driftUp {
+    0% { transform: translate3d(0,12vh,0); opacity: 0; }
+    14% { opacity: 0.55; }
+    86% { opacity: 0.4; }
+    100% { transform: translate3d(4vw,-98vh,0); opacity: 0; }
+  }
+  @keyframes beamSweep {
+    0% { transform: translate3d(-30%, -12%, 0) rotate(14deg); opacity: 0.16; }
+    50% { transform: translate3d(18%, 6%, 0) rotate(9deg); opacity: 0.4; }
+    100% { transform: translate3d(-30%, -12%, 0) rotate(14deg); opacity: 0.16; }
+  }
+  @keyframes mistDriftA {
+    0% { transform: translate3d(-16%, 4%, 0) scale(1.1); opacity: 0.32; }
+    50% { transform: translate3d(12%, -3%, 0) scale(1.25); opacity: 0.5; }
+    100% { transform: translate3d(-16%, 4%, 0) scale(1.1); opacity: 0.32; }
+  }
+  @keyframes mistDriftB {
+    0% { transform: translate3d(14%, -2%, 0) scale(1.2); opacity: 0.24; }
+    50% { transform: translate3d(-12%, 5%, 0) scale(1.05); opacity: 0.42; }
+    100% { transform: translate3d(14%, -2%, 0) scale(1.2); opacity: 0.24; }
+  }
+  @keyframes cabinShake {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    25% { transform: translate3d(0.4px, -0.5px, 0) rotate(0.06deg); }
+    50% { transform: translate3d(-0.3px, 0.4px, 0) rotate(-0.05deg); }
+    75% { transform: translate3d(0.2px, 0.3px, 0) rotate(0.04deg); }
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+</style>
+</helmet>
+
+<div style="position: relative; background: #F7F2EA;">
+
+  <div data-grain="1" style="position: fixed; inset: -50%; z-index: 90; pointer-events: none; opacity: 0.05; mix-blend-mode: multiply; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n%22)%22/></svg>'); animation: grainShift 700ms steps(2, end) infinite;"></div>
+  <div style="position: fixed; inset: 0; z-index: 88; pointer-events: none; box-shadow: inset 0 0 26vw 3vw rgba(197,198,216,0.34);"></div>
+  <div style="position: fixed; inset: 0; z-index: 86; pointer-events: none; background: radial-gradient(95% 55% at 50% -10%, rgba(235,201,196,0.24) 0%, rgba(235,201,196,0) 62%), radial-gradient(55% 40% at 84% 8%, rgba(201,169,106,0.14) 0%, rgba(201,169,106,0) 70%);"></div>
+  <div data-motes="1" style="position: fixed; inset: 0; z-index: 87; pointer-events: none; overflow: hidden;">
+    <span style="position: absolute; bottom: -12vh; left: 4%; width: 4px; height: 4px; border-radius: 50%; background: radial-gradient(circle, rgba(235,201,196,0.9) 0%, rgba(235,201,196,0) 72%); animation: driftUp 26s linear 0s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 11%; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle, rgba(197,198,216,0.85) 0%, rgba(197,198,216,0) 72%); filter: blur(2px); animation: driftUp 34s linear 3s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 19%; width: 3px; height: 3px; border-radius: 50%; background: radial-gradient(circle, rgba(201,169,106,0.8) 0%, rgba(201,169,106,0) 72%); animation: driftUp 22s linear 7s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 27%; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, rgba(235,201,196,0.7) 0%, rgba(235,201,196,0) 72%); filter: blur(3px); animation: driftUp 40s linear 1s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 34%; width: 5px; height: 5px; border-radius: 50%; background: radial-gradient(circle, rgba(197,198,216,0.9) 0%, rgba(197,198,216,0) 72%); animation: driftUp 29s linear 11s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 43%; width: 3px; height: 3px; border-radius: 50%; background: radial-gradient(circle, rgba(201,169,106,0.85) 0%, rgba(201,169,106,0) 72%); animation: driftUp 24s linear 5s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 51%; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, rgba(235,201,196,0.75) 0%, rgba(235,201,196,0) 72%); filter: blur(2px); animation: driftUp 37s linear 14s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 59%; width: 4px; height: 4px; border-radius: 50%; background: radial-gradient(circle, rgba(197,198,216,0.9) 0%, rgba(197,198,216,0) 72%); animation: driftUp 27s linear 2s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 67%; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle, rgba(235,201,196,0.8) 0%, rgba(235,201,196,0) 72%); filter: blur(2px); animation: driftUp 32s linear 9s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 75%; width: 3px; height: 3px; border-radius: 50%; background: radial-gradient(circle, rgba(201,169,106,0.8) 0%, rgba(201,169,106,0) 72%); animation: driftUp 23s linear 16s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 83%; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle, rgba(197,198,216,0.7) 0%, rgba(197,198,216,0) 72%); filter: blur(3px); animation: driftUp 42s linear 6s infinite;"></span>
+    <span style="position: absolute; bottom: -12vh; left: 91%; width: 5px; height: 5px; border-radius: 50%; background: radial-gradient(circle, rgba(235,201,196,0.85) 0%, rgba(235,201,196,0) 72%); animation: driftUp 30s linear 12s infinite;"></span>
+  </div>
+
+  <div data-diffusion="1" style="position: fixed; inset: 0; z-index: 89; pointer-events: none; opacity: 0; background: radial-gradient(70% 55% at 50% 45%, rgba(255,252,244,0.9) 0%, rgba(255,250,240,0.35) 45%, rgba(255,250,240,0) 78%); mix-blend-mode: screen;"></div>
+
+  <nav data-nav="1" style="position: fixed; top: 0; left: 0; right: 0; z-index: 95; display: flex; justify-content: space-between; align-items: center; padding: clamp(14px, 2.4vw, 34px) clamp(16px, 4vw, 56px); opacity: 0; transition: opacity 700ms cubic-bezier(0.22,1,0.36,1);">
+    <span style="font-family: Cormorant, serif; font-size: clamp(15px, 1.1vw, 20px); letter-spacing: 0.32em; color: #8A7355;">H &amp; L</span>
+    <span style="display: flex; gap: clamp(10px, 2.2vw, 38px); font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.3em; text-transform: uppercase;">
+      <a href="#story" style="color: rgba(51,45,39,0.92); padding: 12px 6px;">The Story</a>
+      <a href="#day" style="color: rgba(51,45,39,0.92); padding: 12px 6px;">The Day</a>
+      <a href="#rsvp" style="color: rgba(51,45,39,0.92); padding: 12px 6px;">RSVP</a>
+    </span>
+  </nav>
+
+  <section data-stage="1" data-screen-label="01 Prologue" style="position: relative; height: 520vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #100D16;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:5.6,1.06;y:1,-3;z:0,-240;rx:0,3;b:16,0;at:0,0.78" src="img/ch1.jpg" alt="Helson and Luna at the beach" style="width: 100%; height: 100%; object-fit: cover; object-position: 30% 26%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.66) blur(16px); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.95,0.34;at:0.02,0.66" style="position: absolute; inset: 0; background: #100D16;"></div>
+      <div data-anim="o:0.5,0.8;at:0.5,1" style="position: absolute; inset: 0; background: radial-gradient(120% 92% at 50% 34%, rgba(16,13,22,0.05) 0%, rgba(16,13,22,0.6) 56%, rgba(16,13,22,0.94) 100%);"></div>
+      <div style="position: absolute; left: -20%; top: -30%; width: 70%; height: 170%; background: linear-gradient(100deg, rgba(255,248,232,0) 0%, rgba(255,248,232,0.5) 46%, rgba(255,248,232,0) 100%); filter: blur(44px); animation: beamSweep 26s ease-in-out infinite; pointer-events: none;"></div>
+      <div style="position: absolute; left: -10%; bottom: -6%; width: 80%; height: 46%; border-radius: 50%; background: radial-gradient(closest-side, rgba(226,220,238,0.5) 0%, rgba(226,220,238,0) 100%); filter: blur(40px); animation: mistDriftA 34s ease-in-out infinite; pointer-events: none;"></div>
+      <div style="position: absolute; right: -14%; top: 22%; width: 74%; height: 40%; border-radius: 50%; background: radial-gradient(closest-side, rgba(235,201,196,0.4) 0%, rgba(235,201,196,0) 100%); filter: blur(48px); animation: mistDriftB 42s ease-in-out infinite; pointer-events: none;"></div>
+
+      <div data-anim="o:1,0;at:0.14,0.22" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:1,1;at:0,0.04" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(26px, 3.4vw, 60px); line-height: 1.4; color: #F7F2EA; max-width: 22ch;">A story…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.34,0.42" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:26,0;z:-200,0;at:0.2,0.3" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(26px, 3.4vw, 60px); line-height: 1.4; color: #F7F2EA; opacity: 0; max-width: 20ch;">…written in two hearts.</p>
+      </div>
+      <div data-anim="o:1,0;at:0.56,0.64" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:26,0;z:-200,0;at:0.42,0.52" style="margin: 0; font-size: clamp(11px, 0.8vw, 13px); letter-spacing: 0.36em; text-transform: uppercase; color: rgba(247,242,234,0.88); opacity: 0;">Ours began with</p>
+      </div>
+
+      <div data-anim="o:0,1;at:0.66,0.82" style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 6vw; opacity: 0; pointer-events: none;">
+        <h1 data-anim="ls:16,4;at:0.66,0.92" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(60px, 9.4vw, 176px); line-height: 0.94; letter-spacing: 0.16em; color: #F7F2EA;">Helson<br /><span style="font-style: italic; font-size: 0.44em; letter-spacing: 0.06em; display: inline-block; margin: 0.1em 0; color: #C9A96A;">and</span><br />Luna</h1>
+        <div data-anim="o:0,1;y:16,0;at:0.78,0.9" style="margin-top: clamp(20px, 2.6vw, 40px); font-size: clamp(12px, 0.8vw, 14px); letter-spacing: 0.34em; text-transform: uppercase; color: rgba(247,242,234,0.88); opacity: 0;">17 . 12 . 2026</div>
+      </div>
+
+      <div data-anim="o:1,0;at:0.02,0.1" style="position: absolute; bottom: clamp(22px, 4vh, 54px); left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; pointer-events: none;">
+        <span style="font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(247,242,234,0.88); animation: breathe 3.4s ease-in-out infinite;">Scroll to begin</span>
+        <span style="width: 1px; height: clamp(34px, 6vh, 64px); background: linear-gradient(to bottom, rgba(169,132,63,0.85), rgba(169,132,63,0));"></span>
+      </div>
+
+      <div data-anim="scale:0.5,8.5;z:-500,1300;o:0,0.8;rx:0,9;at:0.7,1;lag:2" style="position: absolute; left: 50%; top: 50%; width: 130vmin; height: 130vmin; margin: -65vmin 0 0 -65vmin; z-index: 6; opacity: 0; pointer-events: none; background: radial-gradient(closest-side, rgba(236,231,244,0.92) 0%, rgba(228,220,236,0.62) 44%, rgba(226,216,236,0) 76%); filter: blur(30px);"></div>
+      <div data-anim="scale:0.8,6;z:-300,1500;o:0,0.5;at:0.74,1;lag:4" style="position: absolute; left: 34%; top: 56%; width: 90vmin; height: 90vmin; margin: -45vmin 0 0 -45vmin; z-index: 6; opacity: 0; pointer-events: none; background: radial-gradient(closest-side, rgba(255,250,240,0.7) 0%, rgba(240,232,240,0) 72%); filter: blur(40px);"></div>
+
+      <div data-anim="o:0,1;at:0.9,1" style="position: absolute; inset: 0; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div style="position: absolute; inset: -15%;">
+          <img data-photo="1" data-anim="scale:2.5,2.3;at:0.9,1" src="img/ch2.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 27% 42%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.12); will-change: transform;" />
+        </div>
+        <div style="position: absolute; inset: 0; background: rgba(26,20,30,0.86);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="story" data-stage="1" data-screen-label="02 Chapter one" style="position: relative; height: 420vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: rgb(26,20,30);">
+      <div style="position: absolute; inset: -16%;">
+        <img data-photo="1" data-anim="scale:2.3,1.04;y:4,-4;ry:5,-3;at:0,0.72" src="img/ch2.jpg" alt="Helson and Luna in Perth" style="width: 100%; height: 100%; object-fit: cover; object-position: 27% 42%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.88); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.86,0.3;at:0.06,0.5" style="position: absolute; inset: 0; background: rgb(26,20,30);"></div>
+      <div data-anim="o:0.3,0.62;at:0.1,0.7" style="position: absolute; inset: 0; background: radial-gradient(70% 60% at 26% 44%, rgba(232,182,110,0.42) 0%, rgba(214,158,92,0.12) 42%, rgba(214,158,92,0) 72%); mix-blend-mode: screen; pointer-events: none;"></div>
+      <div style="position: absolute; left: -18%; top: -24%; width: 66%; height: 150%; background: linear-gradient(100deg, rgba(255,238,206,0) 0%, rgba(255,238,206,0.42) 48%, rgba(255,238,206,0) 100%); filter: blur(50px); animation: beamSweep 30s ease-in-out infinite; pointer-events: none;"></div>
+      <div data-anim="o:0,1;at:0.34,0.6" style="position: absolute; inset: 0; background: linear-gradient(96deg, rgba(26,20,30,0.2) 0%, rgba(26,20,30,0.72) 42%, rgba(26,20,30,0.94) 100%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.1,0.17" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:24,0;at:0.02,0.1" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 52px); line-height: 1.45; color: #F7F2EA; opacity: 0; max-width: 20ch;">It started with a moment…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.26,0.33" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:24,0;at:0.17,0.25" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 52px); line-height: 1.45; color: #F7F2EA; opacity: 0; max-width: 22ch;">…that neither of us expected.</p>
+      </div>
+
+      <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding: 0 clamp(20px, 7vw, 130px);">
+        <div style="width: min(46vw, 560px); min-width: min(84vw, 560px); max-width: 560px;">
+          <div style="perspective: 900px; overflow: hidden;">
+            <p data-anim="y:110,0;o:0,1;at:0.38,0.5" style="margin: 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.36em; text-transform: uppercase; color: #C9A96A; font-weight: 400; opacity: 0;">Chapter one</p>
+          </div>
+          <div style="perspective: 900px; overflow: hidden; margin-top: clamp(14px, 1.6vw, 26px);">
+            <h2 data-anim="y:120,0;o:0,1;z:-420,0;at:0.42,0.56" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(38px, 4.6vw, 82px); line-height: 1.04; color: #F7F2EA; opacity: 0;">And somehow,<br /><span style="font-style: italic;">that moment became everything.</span></h2>
+          </div>
+          <div style="perspective: 900px; overflow: hidden; margin-top: clamp(20px, 2.4vw, 38px);">
+            <p data-anim="y:70,0;o:0,1;at:0.58,0.7" style="margin: 0; max-width: 40ch; font-size: clamp(15px, 1.05vw, 17px); line-height: 1.9; font-weight: 500; color: rgba(247,242,234,0.82); text-wrap: pretty; opacity: 0;">No grand gesture. No perfect timing. Only two people who kept choosing each other, year after quiet year, until choosing became a life.</p>
+          </div>
+        </div>
+      </div>
+
+      <div data-anim="o:0,1;at:0.84,0.9" style="position: absolute; inset: 0; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div data-anim="x:0,-7;at:0.86,1;lag:1" style="position: absolute; inset: 0; clip-path: inset(0% 0px 68% 0px); will-change: transform;">
+          <div style="position: absolute; inset: -15%;">
+            <img data-photo="1" src="img/ch1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 36% 44%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.92); transform: scale(2.5);" />
+          </div>
+          <div style="position: absolute; inset: 0; background: rgba(34,28,38,0.86);"></div>
+        </div>
+        <div data-anim="x:0,5;at:0.86,1;lag:2" style="position: absolute; inset: 0; clip-path: inset(34% 0px 34% 0px); will-change: transform;">
+          <div style="position: absolute; inset: -15%;">
+            <img data-photo="1" src="img/ch1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 36% 44%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.92); transform: scale(2.5);" />
+          </div>
+          <div style="position: absolute; inset: 0; background: rgba(34,28,38,0.86);"></div>
+        </div>
+        <div data-anim="x:0,-4;at:0.86,1;lag:3" style="position: absolute; inset: 0; clip-path: inset(68% 0px 0% 0px); will-change: transform;">
+          <div style="position: absolute; inset: -15%;">
+            <img data-photo="1" src="img/ch1.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 36% 44%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.92); transform: scale(2.5);" />
+          </div>
+          <div style="position: absolute; inset: 0; background: rgba(34,28,38,0.86);"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="03 Memory 01" style="position: relative; height: 360vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: rgb(34,28,38);">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:2.5,1.05;x:-2,3;ry:6,-5;b:8,0;at:0,0.68" src="img/ch1.jpg" alt="Their first two years" style="width: 100%; height: 100%; object-fit: cover; object-position: 36% 44%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(0.92); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.86,0.16;at:0.12,0.52" style="position: absolute; inset: 0; background: rgb(34,28,38);"></div>
+      <div style="position: absolute; right: -16%; bottom: -10%; width: 84%; height: 52%; border-radius: 50%; background: radial-gradient(closest-side, rgba(216,214,238,0.42) 0%, rgba(216,214,238,0) 100%); filter: blur(46px); animation: mistDriftB 38s ease-in-out infinite; pointer-events: none;"></div>
+      <div data-anim="o:0,1;at:0.4,0.66" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(34,28,38,0.9) 0%, rgba(34,28,38,0.5) 50%, rgba(34,28,38,0.68) 100%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.2,0.3" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+        <span data-anim="o:0,1;ls:30,12;at:0.02,0.16" style="font-family: Cormorant, serif; font-weight: 300; font-size: clamp(56px, 9vw, 150px); letter-spacing: 0.3em; color: #F7F2EA; opacity: 0;">01</span>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(30px, 8vh, 96px) clamp(20px, 7vw, 120px);">
+        <div style="perspective: 900px; overflow: hidden; position: relative;">
+          <h3 data-anim="y:110,0;o:0,1;z:-340,0;at:0.46,0.62" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(40px, 4.2vw, 74px); line-height: 1.06; color: #F7F2EA; opacity: 0;">Their first 2 years</h3>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(12px, 1.4vw, 22px); position: relative;">
+          <p data-anim="y:60,0;o:0,1;at:0.62,0.76" style="margin: 0; font-size: clamp(12px, 0.76vw, 13px); letter-spacing: 0.3em; text-transform: uppercase; color: #C9A96A; font-weight: 400; opacity: 0;">Where it began</p>
+        </div>
+      </div>
+
+      <div data-anim="o:0,1;at:0.86,1" style="position: absolute; inset: 0; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div style="position: absolute; inset: -15%;">
+          <img data-photo="1" data-anim="scale:2.4,2.2;at:0.86,1" src="img/ch2.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 24% 40%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.06); will-change: transform;" />
+        </div>
+        <div style="position: absolute; inset: 0; background: rgba(247,242,234,0.84);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="04 Memory 02" style="position: relative; height: 360vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div data-anim="scale:2.2,1.04;y:5,-5;ry:-6,5;at:0,0.7" style="position: absolute; inset: -15%;">
+        <img data-photo="1" src="img/ch2.jpg" alt="Their seventh year" style="width: 100%; height: 100%; object-fit: cover; object-position: 24% 40%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.06); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.84,0.06;at:0.12,0.52" style="position: absolute; inset: 0; background: #F7F2EA;"></div>
+      <div data-anim="o:0,1;at:0.4,0.66" style="position: absolute; inset: 0; background: radial-gradient(90% 72% at 24% 50%, rgba(247,242,234,0.26) 0%, rgba(247,242,234,0.94) 78%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.2,0.3" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+        <span data-anim="o:0,1;ls:30,12;at:0.02,0.16" style="font-family: Cormorant, serif; font-weight: 300; font-size: clamp(56px, 9vw, 150px); letter-spacing: 0.3em; color: #332D27; opacity: 0;">02</span>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; text-align: right; padding: 0 clamp(20px, 7vw, 130px);">
+        <div style="perspective: 900px; overflow: hidden; position: relative;">
+          <h3 data-anim="y:110,0;o:0,1;z:-340,0;at:0.46,0.62" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(40px, 4.2vw, 74px); line-height: 1.06; color: #332D27; opacity: 0;">Their 7th year</h3>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(12px, 1.4vw, 22px); position: relative;">
+          <p data-anim="y:60,0;o:0,1;at:0.62,0.76" style="margin: 0; font-size: clamp(12px, 0.76vw, 13px); letter-spacing: 0.3em; text-transform: uppercase; color: #8A6524; font-weight: 400; opacity: 0;">Still each other's</p>
+        </div>
+      </div>
+
+      <div data-anim="o:0,1;at:0.86,1" style="position: absolute; inset: 0; background: #F7F2EA; opacity: 0;"></div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="05 The pause" style="position: relative; height: 260vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; background: #F7F2EA;">
+      <div data-anim="o:1,0;at:0.3,0.4" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:20,0;at:0.06,0.2" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 54px); line-height: 1.45; color: #332D27; opacity: 0;">There are moments…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.82,0.94" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:20,0;at:0.6,0.74" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 54px); line-height: 1.45; color: #332D27; opacity: 0; max-width: 22ch;">…that change everything.</p>
+      </div>
+      <div data-anim="o:0.2,0.5;at:0.3,1" style="position: absolute; left: 50%; top: 50%; width: 70vmax; height: 70vmax; margin: -35vmax 0 0 -35vmax; background: radial-gradient(circle, rgba(235,201,196,0.4) 0%, rgba(235,201,196,0) 62%); pointer-events: none;"></div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="06 The secret" style="position: relative; height: 400vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:3.1,1.07;y:-3,3;rx:3.5,-2.5;b:10,0;at:0,0.7" src="img/ch3.jpg" alt="With Lyannah" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 38%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.08); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.96,0.08;at:0.16,0.56" style="position: absolute; inset: 0; background: #F7F2EA;"></div>
+      <div data-anim="o:0,1;at:0.44,0.68" style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(247,242,234,0.8) 0%, rgba(247,242,234,0.48) 46%, rgba(247,242,234,0.92) 100%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.22,0.32" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;y:24,0;at:0.02,0.16" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 54px); line-height: 1.45; color: #332D27; opacity: 0; max-width: 24ch;">But there's something you should know…</p>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 6vw;">
+        <div style="perspective: 900px; overflow: hidden; position: relative;">
+          <h3 data-anim="y:110,0;o:0,1;z:-340,0;at:0.5,0.66" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(40px, 4.2vw, 74px); line-height: 1.06; color: #332D27; opacity: 0;">With Lyannah</h3>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(12px, 1.4vw, 22px); position: relative;">
+          <p data-anim="y:60,0;o:0,1;at:0.66,0.8" style="margin: 0; font-size: clamp(12px, 0.76vw, 13px); letter-spacing: 0.3em; text-transform: uppercase; color: #8A6524; font-weight: 400; opacity: 0;">Their baby &nbsp;·&nbsp; Then there were three</p>
+        </div>
+      </div>
+
+      <div data-anim="o:0,1;at:0.86,1" style="position: absolute; inset: 0; background: linear-gradient(to bottom, #DCD6E0 0%, #E8E1E2 46%, #F2EADF 100%); opacity: 0; pointer-events: none;"></div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="07 The crossing" style="position: relative; height: 360vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 900px; transform-style: preserve-3d; background: #D8D2DE;">
+
+      <div data-anim="scale:1.12,1.4;y:1,-7;at:0,1" style="position: absolute; inset: -10%; will-change: transform;">
+        <img data-photo="1" src="img/flight-clouds.png" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.06);" />
+      </div>
+
+      <div data-anim="scale:1.2,1.02;y:3,-6;z:-80,220;at:0,1" style="position: absolute; inset: -12%; will-change: transform;">
+        <picture>
+          <source media="(min-width: 760px)" srcset="img/flight-wide.png" />
+          <img data-photo="1" src="img/flight-portrait.png" alt="The wing over cloud on the way to Perth" style="width: 100%; height: 100%; object-fit: cover; object-position: 46% 54%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.04);" />
+        </picture>
+      </div>
+
+      <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(247,242,234,0.14) 0%, rgba(247,242,234,0) 42%, rgba(247,242,234,0.22) 100%); pointer-events: none;"></div>
+
+      <div style="position: absolute; inset: -50%; z-index: 2; pointer-events: none; opacity: 0.09; mix-blend-mode: multiply; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><filter id=%22n2%22><feTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%224%22 stitchTiles=%22stitch%22/></filter><rect width=%22200%22 height=%22200%22 filter=%22url(%23n2%22)%22/></svg>'); animation: grainShift 700ms steps(2, end) infinite;"></div>
+
+      <div data-anim="scale:0.46,7.6;z:-240,880;at:0.06,0.9" style="position: absolute; left: 50%; top: 50%; width: 46vmin; height: 68vmin; margin: -34vmin 0 0 -23vmin; z-index: 3; will-change: transform; pointer-events: none;">
+        <div style="position: absolute; inset: -3.6vmin; border-radius: 44% / 32%; box-shadow: 0 0 0 140vmax rgba(120,108,94,0.22);"></div>
+        <div style="position: absolute; inset: -1.6vmin; border-radius: 44% / 32%; box-shadow: 0 0 0 140vmax #CFC4B4, 0 2px 10px rgba(60,52,44,0.2);"></div>
+        <div style="position: absolute; inset: 0; border-radius: 45% / 33%; box-shadow: 0 0 0 1.6vmin #DED4C6, inset 0 3px 12px rgba(52,45,38,0.42), inset 0 -14px 26px rgba(255,255,255,0.32);"></div>
+        <div style="position: absolute; inset: 0.9vmin; border-radius: 45% / 33%; box-shadow: inset 0 0 0 0.5vmin rgba(246,242,235,0.9), inset 0 6px 14px rgba(60,52,44,0.22);"></div>
+        <div style="position: absolute; inset: 1.4vmin; border-radius: 45% / 33%; background: linear-gradient(128deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 34%, rgba(255,255,255,0) 52%, rgba(255,255,255,0.13) 88%); pointer-events: none;"></div>
+        <div style="position: absolute; left: 50%; bottom: 2.6vmin; width: 0.9vmin; height: 0.9vmin; margin-left: -0.45vmin; border-radius: 50%; background: rgba(46,40,34,0.5); box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);"></div>
+      </div>
+
+      <div data-anim="o:1,0;at:0.58,0.68" style="position: absolute; inset: 0; z-index: 4; display: flex; align-items: flex-end; justify-content: center; text-align: center; padding: 0 8vw clamp(34px, 9vh, 110px); pointer-events: none;">
+        <p data-anim="o:0,1;y:22,0;at:0.38,0.52" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 3vw, 52px); line-height: 1.45; color: #FBF8F2; text-shadow: 0 1px 26px rgba(52,45,38,0.6); opacity: 0;">A whole hemisphere away.</p>
+      </div>
+
+      <div data-anim="o:0,1;at:0.88,1" style="position: absolute; inset: 0; z-index: 5; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div style="position: absolute; inset: -15%;">
+          <img data-photo="1" data-anim="scale:2.2,2;at:0.88,1" src="img/ch4.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 54%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.1); will-change: transform;" />
+        </div>
+        <div style="position: absolute; inset: 0; background: rgba(247,242,234,0.8);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="08 Memory 04" style="position: relative; height: 360vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:2,1.04;y:4,-6;rx:-3.5,2.5;b:8,0;at:0,0.6" src="img/ch4.jpg" alt="Latest in Perth" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 54%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.1); will-change: transform;" />
+      </div>
+      <div data-anim="scale:1.62,1.04;y:12,-16;at:0,0.62;lag:2" style="position: absolute; inset: -15%; z-index: 1; will-change: transform; -webkit-mask-image: linear-gradient(to top, #000 0%, #000 22%, rgba(0,0,0,0) 44%); mask-image: linear-gradient(to top, #000 0%, #000 22%, rgba(0,0,0,0) 44%);">
+        <img data-photo="1" src="img/ch4.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 54%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.02);" />
+      </div>
+      <div data-anim="o:0.8,0.04;at:0.08,0.46" style="position: absolute; inset: 0; z-index: 2; background: #F7F2EA;"></div>
+      <div data-anim="o:0,1;at:0.34,0.6" style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(247,242,234,0.92) 0%, rgba(247,242,234,0.44) 52%, rgba(247,242,234,0.76) 100%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.18,0.28" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+        <span data-anim="o:0,1;ls:30,12;at:0.01,0.14" style="font-family: Cormorant, serif; font-weight: 300; font-size: clamp(56px, 9vw, 150px); letter-spacing: 0.3em; color: #332D27; opacity: 0;">04</span>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: clamp(30px, 9vh, 110px) clamp(20px, 7vw, 120px);">
+        <div style="perspective: 900px; overflow: hidden; position: relative;">
+          <h3 data-anim="y:110,0;o:0,1;z:-340,0;at:0.42,0.58" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(40px, 4.2vw, 74px); line-height: 1.06; color: #332D27; opacity: 0;">Latest in Perth</h3>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(12px, 1.4vw, 22px); position: relative;">
+          <p data-anim="y:60,0;o:0,1;at:0.58,0.72" style="margin: 0; font-size: clamp(12px, 0.76vw, 13px); letter-spacing: 0.3em; text-transform: uppercase; color: #8A6524; font-weight: 400; opacity: 0;">Western Australia &nbsp;·&nbsp; Home, for now</p>
+        </div>
+      </div>
+      <div data-anim="o:0,1;at:0.78,0.98" style="position: absolute; inset: 0; background: #241E2C; opacity: 0;"></div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="09 The big reveal" style="position: relative; height: 460vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #241E2C;">
+      <div data-anim="o:1,0;at:0.08,0.14" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0,0.06" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(22px, 2.6vw, 46px); color: rgba(247,242,234,0.9); opacity: 0;">After all the memories…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.22,0.28" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0.14,0.2" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(22px, 2.6vw, 46px); color: rgba(247,242,234,0.9); opacity: 0;">…all the laughter…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.36,0.42" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0.28,0.34" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(22px, 2.6vw, 46px); color: rgba(247,242,234,0.9); opacity: 0;">…all the adventures…</p>
+      </div>
+
+      <div data-anim="o:1,0;at:0.54,0.62" style="position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; perspective: 900px; pointer-events: none;">
+        <p data-anim="o:0,1;z:-1900,1100;rx:0,6;at:0.38,0.6;lag:2" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(96px, 24vw, 400px); line-height: 0.9; letter-spacing: 0.08em; color: rgba(249,245,239,0.92); white-space: nowrap; opacity: 0;">FOREVER</p>
+      </div>
+
+      <div data-anim="o:0,1;scale:0.3,1.7;at:0.42,0.78" style="position: absolute; left: 50%; top: 50%; width: 120vmax; height: 120vmax; margin: -60vmax 0 0 -60vmax; background: radial-gradient(circle at 50% 50%, rgba(247,242,234,0.44) 0%, rgba(235,201,196,0.18) 26%, rgba(197,198,216,0) 60%); opacity: 0; pointer-events: none;"></div>
+      <img data-anim="o:0,0.45;scale:1.1,0.98;z:-300,0;at:0.46,0.72" data-base-transform="translate(-50%,-50%) " src="img/monogram.png" alt="" style="position: absolute; left: 50%; top: 50%; width: min(78vw, 620px); transform: translate(-50%,-50%); opacity: 0; pointer-events: none; filter: brightness(1.15) saturate(0.9);" />
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 6vw;">
+        <h2 data-anim="o:0,1;ls:24,6;z:-820,0;at:0.5,0.68" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(46px, 7.4vw, 132px); line-height: 1.02; letter-spacing: 0.06em; color: #F9F5EF; text-transform: uppercase; opacity: 0;">We're<br />getting<br />married</h2>
+        <div data-anim="o:0,1;y:40,0;at:0.72,0.82" style="margin-top: clamp(24px, 3.4vw, 54px); display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 1.2vw, 18px); opacity: 0;">
+          <span style="width: clamp(40px, 6vw, 90px); height: 1px; background: rgba(201,169,106,0.85);"></span>
+          <span style="font-size: clamp(12px, 0.9vw, 15px); letter-spacing: 0.32em; text-transform: uppercase; color: #F7F2EA; font-weight: 400;">December 17, 2026</span>
+        </div>
+        <div data-anim="o:0,1;y:30,0;at:0.84,0.94" style="margin-top: clamp(12px, 1.4vw, 20px); opacity: 0;">
+          <span style="font-family: Cormorant, serif; font-style: italic; font-size: clamp(17px, 1.35vw, 24px); color: rgba(247,242,234,0.8);">St. Clement's Church</span>
+        </div>
+      </div>
+      <div data-anim="o:0,1;at:0.84,0.95" style="position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 50%, #FFFDF8 0%, #FFF9F0 58%, #F6F1F7 100%); opacity: 0;"></div>
+      <div data-anim="o:0,1;at:0.95,1" style="position: absolute; inset: 0; background: #EFEAF2; opacity: 0;"></div>
+    </div>
+  </section>
+
+  <section id="day" data-stage="1" data-screen-label="10 The day" style="position: relative; height: 480vh; background: #EFEAF2;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #EFEAF2; color: #332D27;">
+      <div data-anim="o:1,0;at:0.08,0.14" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0,0.06" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 2.8vw, 50px); color: #332D27; opacity: 0;">On this day…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.24,0.3" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;ls:20,8;at:0.14,0.22" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(30px, 4.4vw, 78px); letter-spacing: 0.08em; color: #332D27; opacity: 0;">December 17, 2026</p>
+      </div>
+      <div data-anim="o:1,0;at:0.4,0.46" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0.3,0.38" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(24px, 2.8vw, 50px); color: #332D27; opacity: 0; max-width: 24ch;">at St. Clement's Church…</p>
+      </div>
+      <div data-anim="o:1,0;at:0.56,0.62" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0.46,0.54" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(28px, 3.4vw, 62px); color: #332D27; opacity: 0;">…we'll say forever.</p>
+      </div>
+
+      <div data-anim="o:0,1;at:0.6,0.72" style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(24px, 5vh, 70px) clamp(20px, 6vw, 90px); gap: clamp(13px, 3vh, 44px); opacity: 0;">
+        <img data-anim="o:0,1;scale:1.06,1;z:-320,0;at:0.6,0.74" src="img/monogram.png" alt="Helson and Luna monogram" style="width: min(40vw, 200px); max-height: 17vh; object-fit: contain; clip-path: inset(0px 0px 15% 0px); opacity: 0;" />
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(22px, 5vw, 92px); width: min(1040px, 100%); text-align: center;">
+          <div data-anim="o:0,1;y:60,0;z:-240,0;at:0.66,0.8" style="opacity: 0;">
+            <p style="margin: 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.34em; text-transform: uppercase; color: #8A6524;">The Ceremony</p>
+            <h3 style="margin: clamp(14px, 1.6vw, 22px) 0 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(30px, 2.9vw, 48px); line-height: 1.14;">St. Clement's<br />Church</h3>
+            <p style="margin: clamp(14px, 1.6vw, 22px) 0 0; font-size: clamp(13px, 0.85vw, 14px); line-height: 2; font-weight: 500; color: rgba(51,45,39,0.9);">Thursday, December 17, 2026<br />Time to be confirmed</p>
+          </div>
+          <div data-anim="o:0,1;y:60,0;z:-240,0;at:0.72,0.86" style="opacity: 0;">
+            <p style="margin: 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.34em; text-transform: uppercase; color: #8A6524;">The Reception</p>
+            <h3 style="margin: clamp(14px, 1.6vw, 22px) 0 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(30px, 2.9vw, 48px); line-height: 1.14;">Diversion 21</h3>
+            <p style="margin: clamp(14px, 1.6vw, 22px) 0 0; font-size: clamp(13px, 0.85vw, 14px); line-height: 2; font-weight: 500; color: rgba(51,45,39,0.9);">Following the ceremony<br />Dinner and dancing</p>
+          </div>
+        </div>
+      </div>
+
+      <div data-anim="scale:0.5,8.5;z:-500,1300;o:0,0.8;rx:0,9;at:0.7,1;lag:2" style="position: absolute; left: 50%; top: 50%; width: 130vmin; height: 130vmin; margin: -65vmin 0 0 -65vmin; z-index: 6; opacity: 0; pointer-events: none; background: radial-gradient(closest-side, rgba(236,231,244,0.92) 0%, rgba(228,220,236,0.62) 44%, rgba(226,216,236,0) 76%); filter: blur(30px);"></div>
+      <div data-anim="scale:0.8,6;z:-300,1500;o:0,0.5;at:0.74,1;lag:4" style="position: absolute; left: 34%; top: 56%; width: 90vmin; height: 90vmin; margin: -45vmin 0 0 -45vmin; z-index: 6; opacity: 0; pointer-events: none; background: radial-gradient(closest-side, rgba(255,250,240,0.7) 0%, rgba(240,232,240,0) 72%); filter: blur(40px);"></div>
+
+      <div data-anim="o:0,1;at:0.82,0.86" style="position: absolute; inset: 0; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div style="position: absolute; inset: -15%;">
+          <img data-photo="1" data-anim="scale:1.34,1.22;at:0.82,1" src="img/ch4.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.04); will-change: transform;" />
+        </div>
+        <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(247,242,234,0.92) 0%, rgba(247,242,234,0.5) 62%, rgba(247,242,234,0.66) 100%);"></div>
+        <div data-anim="x:0,-104;at:0.86,1;lag:1" style="position: absolute; top: 0; bottom: 0; left: 0; width: 50.2%; background: linear-gradient(to left, #E7E1EB 0%, #EFEAF2 34%, #F1ECF4 100%); box-shadow: 6px 0 26px rgba(70,60,80,0.16); will-change: transform;"></div>
+        <div data-anim="x:0,104;at:0.86,1;lag:2" style="position: absolute; top: 0; bottom: 0; right: 0; width: 50.2%; background: linear-gradient(to right, #E7E1EB 0%, #EFEAF2 34%, #F1ECF4 100%); box-shadow: -6px 0 26px rgba(70,60,80,0.16); will-change: transform;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="11 Dress code" style="position: relative; height: 320vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:1.8,1.06;y:3,-3;ry:4,-4;at:0,0.62" src="img/ch4.jpg" alt="Dress code reference" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.04); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.86,0.04;at:0.06,0.44" style="position: absolute; inset: 0; background: #F7F2EA;"></div>
+      <div data-anim="o:0,1;at:0.3,0.56" style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(247,242,234,0.92) 0%, rgba(247,242,234,0.5) 62%, rgba(247,242,234,0.66) 100%); opacity: 0;"></div>
+
+      <div data-anim="o:1,0;at:0.18,0.26" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8vw; pointer-events: none;">
+        <p data-anim="o:0,1;at:0.02,0.14" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(22px, 2.6vw, 46px); color: #332D27; opacity: 0;">One last thing…</p>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; justify-content: center; padding: 0 clamp(20px, 8vw, 150px);">
+        <div style="perspective: 900px; overflow: hidden;">
+          <p data-anim="y:100,0;o:0,1;at:0.34,0.48" style="margin: 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.36em; text-transform: uppercase; color: #8A6524; font-weight: 400; opacity: 0;">Attire</p>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(12px, 1.6vw, 24px);">
+          <h2 data-anim="y:130,0;o:0,1;z:-560,0;at:0.38,0.56" style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(54px, 8vw, 148px); line-height: 0.94; letter-spacing: 0.02em; color: #332D27; text-transform: uppercase; opacity: 0;">Dress<br />Code</h2>
+        </div>
+        <div style="perspective: 900px; overflow: hidden; margin-top: clamp(20px, 2.6vw, 40px);">
+          <p data-anim="y:70,0;o:0,1;at:0.56,0.72" style="margin: 0; max-width: 34ch; font-size: clamp(15px, 1.05vw, 17px); line-height: 1.95; font-weight: 500; color: rgba(51,45,39,0.92); opacity: 0;">Formal. Details to follow — the couple will share colours and any notes closer to the day.</p>
+        </div>
+      </div>
+
+      <div data-anim="o:0,0.9;at:0.74,0.94" style="position: absolute; inset: 0; z-index: 4; opacity: 0; pointer-events: none; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);"></div>
+      <div data-anim="o:0,1;at:0.76,0.9" style="position: absolute; inset: 0; z-index: 4; opacity: 0; pointer-events: none;">
+        <span data-anim="y:0,-140;scale:0.6,2.4;at:0.76,1;lag:1" style="position: absolute; left: 22%; bottom: 18%; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle, rgba(255,252,246,0.95) 0%, rgba(235,201,196,0) 72%); filter: blur(2px);"></span>
+        <span data-anim="y:0,-190;scale:0.5,2.8;at:0.76,1;lag:2" style="position: absolute; left: 44%; bottom: 12%; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle, rgba(255,252,246,0.9) 0%, rgba(197,198,216,0) 72%); filter: blur(3px);"></span>
+        <span data-anim="y:0,-160;scale:0.6,2.2;at:0.76,1;lag:3" style="position: absolute; left: 63%; bottom: 22%; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle, rgba(255,252,246,0.95) 0%, rgba(235,201,196,0) 72%); filter: blur(2px);"></span>
+        <span data-anim="y:0,-210;scale:0.4,3;at:0.76,1;lag:4" style="position: absolute; left: 78%; bottom: 10%; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle, rgba(255,252,246,0.85) 0%, rgba(197,198,216,0) 72%); filter: blur(4px);"></span>
+        <span data-anim="y:0,-120;scale:0.7,2;at:0.76,1;lag:2" style="position: absolute; left: 33%; bottom: 30%; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle, rgba(255,252,246,1) 0%, rgba(201,169,106,0) 72%); filter: blur(1px);"></span>
+      </div>
+      <div data-anim="o:0,1;at:0.86,1" style="position: absolute; inset: 0; z-index: 5; overflow: hidden; opacity: 0; pointer-events: none;">
+        <div style="position: absolute; inset: -15%;">
+          <img data-photo="1" data-anim="scale:1.2,1.14;at:0.86,1" src="img/ch3.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.16) blur(16px); will-change: transform;" />
+        </div>
+        <div style="position: absolute; inset: 0; background: radial-gradient(72% 62% at 50% 48%, rgba(247,242,234,0.78) 0%, rgba(247,242,234,0.96) 76%);"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rsvp" data-stage="1" data-screen-label="12 RSVP" style="position: relative; height: 300vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:1.14,1.06;z:-180,90;at:0,0.6" src="img/ch3.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.16) blur(16px); will-change: transform;" />
+      </div>
+      <div style="position: absolute; inset: 0; background: radial-gradient(72% 62% at 50% 48%, rgba(247,242,234,0.78) 0%, rgba(247,242,234,0.96) 76%);"></div>
+
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(24px, 5vh, 60px) clamp(20px, 6vw, 80px); overflow-y: auto;">
+          <div data-anim="o:0,1;y:50,0;z:-340,0;at:0.04,0.24" style="text-align: center; opacity: 0;">
+            <h2 style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-style: italic; font-size: clamp(30px, 3.6vw, 60px); line-height: 1.25; color: #332D27; max-width: 22ch;">Will you be there when our forever begins?</h2>
+            <p style="margin: clamp(14px, 1.8vw, 26px) 0 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.32em; text-transform: uppercase; color: #8A6524;">Please RSVP by November 17, 2026</p>
+          </div>
+
+          <form data-anim="o:0,1;y:60,0;at:0.14,0.38" onSubmit="{{ submit }}" style="margin-top: clamp(28px, 4vh, 56px); width: min(560px, 100%); display: flex; flex-direction: column; gap: clamp(16px, 2.2vh, 26px); opacity: 0;">
+            <label style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(51,45,39,0.75);">Name</span>
+              <input type="text" value="{{ name }}" onChange="{{ setName }}" placeholder="Your full name" style="background: transparent; border: none; border-bottom: 1px solid rgba(74,65,57,0.24); padding: 15px 0; color: #332D27; font-size: clamp(15px, 1.05vw, 17px); font-weight: 400;" />
+            </label>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <span style="font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(51,45,39,0.75);">Will you be there</span>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" onClick="{{ pickYes }}" style="{{ yesStyle }}">Joyfully accepts</button>
+                <button type="button" onClick="{{ pickNo }}" style="{{ noStyle }}">Regretfully declines</button>
+              </div>
+            </div>
+
+            <label style="display: flex; flex-direction: column; gap: 8px;">
+              <span style="font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(51,45,39,0.75);">A message for Helson &amp; Luna</span>
+              <textarea rows="2" value="{{ message }}" onChange="{{ setMessage }}" placeholder="Optional" style="background: transparent; border: none; border-bottom: 1px solid rgba(74,65,57,0.24); padding: 15px 0; color: #332D27; font-size: clamp(15px, 1.05vw, 17px); font-weight: 400; resize: none; line-height: 1.7;"></textarea>
+            </label>
+
+            <button type="submit" style="margin-top: clamp(8px, 1.4vh, 18px); align-self: flex-start; background: transparent; border: 1px solid rgba(169,132,63,0.6); color: #7A6544; padding: clamp(17px, 1.3vw, 20px) clamp(30px, 3.4vw, 48px); font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; transition: background 500ms cubic-bezier(0.22,1,0.36,1), color 500ms, letter-spacing 500ms;" style-hover="background: #C9A96A; color: #FBF8F3; letter-spacing: 0.34em;">Send RSVP</button>
+          </form>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 6vw; gap: clamp(16px, 2.4vw, 30px);">
+          <span style="width: clamp(40px, 6vw, 90px); height: 1px; background: rgba(169,132,63,0.75);"></span>
+          <h2 style="margin: 0; font-family: Cormorant, serif; font-weight: 300; font-size: clamp(34px, 6.4vw, 112px); line-height: 1.02; letter-spacing: 0.06em; text-transform: uppercase; color: #332D27;">See you at<br />the altar</h2>
+          <p style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-size: clamp(18px, 1.5vw, 26px); color: rgba(51,45,39,0.95);">Helson &amp; Luna &nbsp;·&nbsp; 17 . 12 . 2026</p>
+          <p style="margin: 0; font-size: clamp(13px, 0.85vw, 14px); font-weight: 400; color: rgba(51,45,39,0.8);">{{ thanks }}</p>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <section data-stage="1" data-screen-label="13 Full circle" style="position: relative; height: 420vh;">
+    <div style="position: sticky; top: 0; height: 100svh; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; background: #F7F2EA;">
+      <div style="position: absolute; inset: -15%;">
+        <img data-photo="1" data-anim="scale:1.5,1;b:10,0;z:-160,60;at:0,0.5" src="img/ch1.jpg" alt="Helson and Luna, the full photograph" style="width: 100%; height: 100%; object-fit: cover; object-position: 34% 34%; filter: grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86) brightness(1.12); will-change: transform;" />
+      </div>
+      <div data-anim="o:0.3,0.8;at:0.3,0.86" style="position: absolute; inset: 0; background: radial-gradient(82% 72% at 50% 50%, rgba(247,242,234,0.6) 0%, rgba(247,242,234,0.96) 82%);"></div>
+      <div data-anim="o:0.35,0.96;at:0.28,0.6" style="position: absolute; inset: 0; background: radial-gradient(58% 46% at 50% 56%, rgba(247,242,234,0.97) 0%, rgba(247,242,234,0.8) 58%, rgba(247,242,234,0) 100%); pointer-events: none;"></div>
+
+      <div data-anim="o:1,0;at:0.26,0.34" style="position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; text-align: center; padding: 0 8vw clamp(40px, 10vh, 120px); pointer-events: none;">
+        <p data-anim="o:0,1;y:20,0;at:0.1,0.22" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-weight: 300; font-size: clamp(22px, 2.6vw, 46px); line-height: 1.5; color: #332D27; opacity: 0; max-width: 24ch;">And so, our next chapter begins.</p>
+      </div>
+
+      <div style="position: absolute; inset: 0; perspective: 1100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 6vw; gap: clamp(14px, 2.2vw, 30px);">
+        <img data-anim="o:0,0.95;scale:1.08,1;z:-260,0;at:0.42,0.62" src="img/monogram.png" alt="" style="width: min(34vw, 186px); max-height: 17vh; object-fit: contain; clip-path: inset(0px 0px 15% 0px); opacity: 0;" />
+        <p data-anim="o:0,1;y:30,0;z:-300,0;at:0.52,0.7" style="margin: 0; font-family: Cormorant, serif; font-style: italic; font-size: clamp(22px, 2.4vw, 42px); line-height: 1.5; color: #332D27; opacity: 0; max-width: 26ch;">Thank you for being part of our story.</p>
+        <div data-anim="o:0,1;at:0.68,0.84" style="display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 1.4vw, 18px); opacity: 0;">
+          <span style="width: 1px; height: clamp(30px, 5vh, 60px); background: linear-gradient(to bottom, rgba(169,132,63,0), rgba(169,132,63,0.85));"></span>
+          <p style="margin: 0; font-size: clamp(12px, 0.9vw, 15px); letter-spacing: 0.36em; text-transform: uppercase; color: #332D27; font-weight: 400;">Helson &amp; Luna</p>
+          <p style="margin: 0; font-size: clamp(12px, 0.72vw, 13px); letter-spacing: 0.32em; text-transform: uppercase; color: #8A6524;">December 17, 2026</p>
+          <p data-anim="o:0,1;at:0.78,0.9" style="margin: clamp(10px, 1.6vh, 20px) 0 0; font-family: Cormorant, serif; font-style: italic; font-size: clamp(17px, 1.5vw, 26px); color: rgba(51,45,39,0.8); opacity: 0;">Forever starts here.</p>
+        </div>
+        <button data-anim="o:0,1;at:0.82,0.94" onClick="{{ restart }}" style="margin-top: clamp(10px, 2vh, 26px); background: transparent; border: 1px solid rgba(74,65,57,0.24); color: rgba(51,45,39,0.88); padding: 16px 28px; font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer; opacity: 0; transition: border-color 500ms, color 500ms;" style-hover="border-color: rgba(169,132,63,0.85); color: #332D27;">Watch again</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;filmGrade&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Blush monochrome&quot;,&quot;Soft color&quot;,&quot;Lavender silver&quot;],&quot;default&quot;:&quot;Blush monochrome&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Film&quot;},&quot;filmGrain&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Film&quot;},&quot;atmosphere&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Film&quot;},&quot;cameraIntensity&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.3,&quot;max&quot;:1.6,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Film&quot;}}">
+class Component extends DCLogic {
+  state = { name: '', attending: '', message: '', sent: false };
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.onResize = () => this.collect();
+    window.addEventListener('resize', this.onResize);
+    this.collect();
+    this.tick = this.tick.bind(this);
+    this.raf = requestAnimationFrame(this.tick);
+    this.applyGrade();
+  }
+
+  componentDidUpdate() {
+    this.collect();
+    this.applyGrade();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize);
+    cancelAnimationFrame(this.raf);
+  }
+
+  parse(s) {
+    const o = {};
+    (s || '').split(';').forEach(seg => {
+      const i = seg.indexOf(':');
+      if (i < 0) return;
+      o[seg.slice(0, i).trim()] = seg.slice(i + 1).split(',').map(Number);
+    });
+    return o;
+  }
+
+  collect() {
+    this.mobile = window.innerWidth < 760;
+    document.querySelectorAll('[data-stage]').forEach(el => {
+      if (!el.dataset.h0) el.dataset.h0 = String(parseFloat(el.style.height) || 300);
+      const base = parseFloat(el.dataset.h0);
+      el.style.height = Math.round(this.mobile ? base * 0.76 : base) + 'svh';
+    });
+    this.stages = Array.from(document.querySelectorAll('[data-stage]')).map(el => ({
+      el,
+      items: Array.from(el.querySelectorAll('[data-anim]')).map(n => ({ n, a: this.parse(n.dataset.anim) }))
+    }));
+    this.nav = document.querySelector('[data-nav]');
+    this.diffusion = document.querySelector('[data-diffusion]');
+    this.grain = document.querySelector('[data-grain]');
+    this.motes = document.querySelector('[data-motes]');
+    this.rsvpStage = document.getElementById('rsvp');
+    // the nav must not interrupt the mystery: it appears once the prologue has paid off
+    this.navFrom = this.stages.length ? this.stages[0].el.offsetHeight * 0.7 : 800;
+    const grain = document.querySelector('[data-grain]');
+    if (grain) grain.style.display = (this.props.filmGrain ?? true) ? 'block' : 'none';
+    const motes = document.querySelector('[data-motes]');
+    if (motes) motes.style.display = (this.props.atmosphere ?? true) ? 'block' : 'none';
+  }
+
+  applyGrade() {
+    const grade = this.props.filmGrade || 'Blush monochrome';
+    const map = {
+      'Blush monochrome': 'grayscale(1) sepia(0.34) saturate(1.22) contrast(0.86)',
+      'Soft color': 'saturate(0.6) sepia(0.1) contrast(0.9)',
+      'Lavender silver': 'grayscale(1) sepia(0.3) hue-rotate(198deg) saturate(1.4) contrast(0.88)'
+    };
+    const base = map[grade] || map['Blush monochrome'];
+    document.querySelectorAll('[data-photo]').forEach(img => {
+      const b = (img.style.filter.match(/brightness\([^)]*\)/) || [''])[0];
+      const bl = (img.style.filter.match(/blur\([^)]*\)/) || [''])[0];
+      img.style.filter = [base, b, bl].filter(Boolean).join(' ');
+    });
+  }
+
+  tick() {
+    const vh = window.innerHeight;
+    const k = this.props.cameraIntensity ?? 1;
+    const y = window.scrollY;
+    if (this.nav) this.nav.style.opacity = y > this.navFrom ? '1' : '0';
+
+    // scroll velocity: drives lens diffusion and the drift of the particles
+    const dy = y - (this.lastY === undefined ? y : this.lastY);
+    this.lastY = y;
+    this.vel = (this.vel || 0) + (Math.abs(dy) - (this.vel || 0)) * 0.18;
+    this.drift = (this.drift || 0) + ((-dy * 2.2) - (this.drift || 0)) * 0.08;
+    this.drift = Math.max(-70, Math.min(70, this.drift));
+
+    if (this.diffusion) this.diffusion.style.opacity = String(Math.min(0.3, this.vel / 260));
+    if (this.motes) this.motes.style.transform = 'translate3d(0,' + this.drift.toFixed(1) + 'px,0)';
+
+    // the RSVP is a sanctuary: the air goes still
+    if (this.rsvpStage) {
+      const rr = this.rsvpStage.getBoundingClientRect();
+      const inside = rr.top < vh * 0.6 && rr.bottom > vh * 0.4;
+      const hush = inside ? 0.22 : 1;
+      this.hush = (this.hush === undefined ? hush : this.hush + (hush - this.hush) * 0.06);
+      if (this.motes) this.motes.style.opacity = String(this.hush);
+      if (this.grain) this.grain.style.opacity = String(0.02 + 0.03 * this.hush);
+    }
+
+    (this.stages || []).forEach(stage => {
+      const r = stage.el.getBoundingClientRect();
+      const span = Math.max(1, r.height - vh);
+      const target = Math.min(1, Math.max(0, -r.top / span));
+      // ease the camera toward the scroll position instead of pinning it — floating, not stepped
+      stage.p = stage.p === undefined ? target : stage.p + (target - stage.p) * 0.14;
+      const p = Math.abs(target - stage.p) < 0.0004 ? target : stage.p;
+      stage.items.forEach(item => {
+        const n = item.n, a = item.a;
+        const at = a.at || [0, 1];
+        let lp = Math.min(1, Math.max(0, (p - at[0]) / Math.max(0.0001, at[1] - at[0])));
+        lp = lp * lp * (3 - 2 * lp);
+        // lag: secondary motion. heavier layers trail the camera instead of moving with it
+        if (a.lag) {
+          const f = 0.24 / Math.max(1, a.lag[0]);
+          item.s = item.s === undefined ? lp : item.s + (lp - item.s) * f;
+          lp = item.s;
+        }
+        const lerp = pair => pair[0] + (pair[1] - pair[0]) * lp;
+
+        if (!this.reduced) {
+          const parts = [];
+          if (a.x || a.y) parts.push('translate3d(' + (a.x ? lerp(a.x) * k : 0) + '%,' + (a.y ? lerp(a.y) * k : 0) + '%,0)');
+          if (a.z) parts.push('translateZ(' + lerp(a.z) * k * (this.mobile ? 0.55 : 1) + 'px)');
+          if (a.rx) parts.push('rotateX(' + lerp(a.rx) * k + 'deg)');
+          if (a.ry) parts.push('rotateY(' + lerp(a.ry) * k + 'deg)');
+          if (a.scale) parts.push('scale(' + (1 + (lerp(a.scale) - 1) * k) + ')');
+          if (a.r) parts.push('rotate(' + lerp(a.r) * k + 'deg)');
+          if (parts.length) n.style.transform = (n.dataset.baseTransform || '') + parts.join(' ');
+          if (a.b && !this.mobile) {
+            const bl = lerp(a.b);
+            const base = n.style.filter.replace(/\s*blur\([^)]*\)/, '');
+            n.style.filter = bl > 0.05 ? base + ' blur(' + bl + 'px)' : base;
+          }
+        }
+        if (a.o) n.style.opacity = String(lerp(a.o));
+        if (a.clip) n.style.clipPath = 'inset(0px 0px ' + lerp(a.clip) + '% 0px)';
+        if (a.ls) n.style.letterSpacing = lerp(a.ls) / 100 + 'em';
+      });
+    });
+    this.raf = requestAnimationFrame(this.tick);
+  }
+
+  btn(active) {
+    return 'background:' + (active ? '#C9A96A' : 'transparent') +
+      ';color:' + (active ? '#FBF8F3' : 'rgba(51,45,39,0.92)') +
+      ';border:1px solid ' + (active ? '#C9A96A' : 'rgba(74,65,57,0.24)') +
+      ';padding:15px 24px;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;cursor:pointer;transition:all 450ms cubic-bezier(0.22,1,0.36,1)';
+  }
+
+  renderVals() {
+    return {
+      name: this.state.name,
+      message: this.state.message,
+      sent: this.state.sent,
+      notSent: !this.state.sent,
+      yesStyle: this.btn(this.state.attending === 'yes'),
+      noStyle: this.btn(this.state.attending === 'no'),
+      setName: e => this.setState({ name: e.target.value }),
+      setMessage: e => this.setState({ message: e.target.value }),
+      pickYes: () => this.setState({ attending: 'yes' }),
+      pickNo: () => this.setState({ attending: 'no' }),
+      submit: e => { e.preventDefault(); this.setState({ sent: true }); },
+      thanks: this.state.name ? 'Thank you, ' + this.state.name + '.' : 'Thank you.',
+      restart: () => window.scrollTo({ top: 0, behavior: 'smooth' })
+    };
+  }
+}
+</script>
+</body>
+</html>
