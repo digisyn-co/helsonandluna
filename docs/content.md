@@ -52,7 +52,7 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 ## Decisions (2026-09-22)
 - **Name order and date:** the site is correct, **Helson & Luna, December 17, 2026** (confirmed again 2026-09-22).
 - **Monogram:** now the transparent "HELSON & LUNA" artwork from the August site (digisyn-co/helsonandluna), used exactly as drawn. Only its printed text line is cropped off; that line's date reads **"12.12 2026"**, which is wrong. Names and date are set as live type. The older blue monogram ("LUNA & HELSON · 12·17·2024") is no longer used.
-- **Photos:** real couple photos from the August site (beach, coast) now appear in "The Two of Us".
+- **Photos:** real couple photos from the August site (beach, coast) now appear in "The Two of Us", and its family selfie replaces the AI baby-shoes image in "Family". All old-site photos (AI stand-ins, screenshots, the old blue monogram) were removed; the "smallest pair of shoes" line is no longer shown.
 - **RSVP:** a form built into the site replaces the dead email address. Delivery target: `TODO(content)`, see the report.
 - **Photos:** only the real photo shoot is used for people; AI imagery is limited to objects (the baby shoes).
 

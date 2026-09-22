@@ -1,6 +1,6 @@
 /* Design tokens — the single place for colour, type, spacing and motion values. */
 :root {
-  /* Palette (translated from docs/reference/theme-artwork.png) */
+  /* Palette (translated from the original theme artwork and the monogram) */
   --midnight-950: #070a16;   /* opening darkness */
   --midnight-900: #0c1227;
   --midnight-800: #151d3b;

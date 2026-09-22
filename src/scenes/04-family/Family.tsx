@@ -11,13 +11,13 @@ import { Picture } from "@/components/ui/Picture";
 import s from "./family.module.css";
 
 /** Memories placed at real depths in a CSS 3D space; the camera travels through them. */
-type Layer = { key: string; photo: Photo; x: string; y: string; z: number; w: string; blur: number; caption?: string };
+type Layer = { key: string; photo: Photo; x: string; y: string; z: number; w: string; blur: number };
 
 const LAYERS: Layer[] = [
   // Offsets grow with depth so perspective places each memory near the frame edges.
   // Widths cap on large screens so desktop keeps the phone's composition, at a sane scale.
   { key: "fg", photo: photos.daughterLaughing, x: "max(-38vw, -300px)", y: "18svh", z: -120, w: "min(56vw, 380px)", blur: 6 },
-  { key: "shoes", photo: photos.babyShoes, x: "max(-42vw, -380px)", y: "-16svh", z: -480, w: "min(50vw, 400px)", blur: 0, caption: story.family.shoes },
+  { key: "selfie", photo: photos.familySelfie, x: "max(-42vw, -380px)", y: "-16svh", z: -480, w: "min(50vw, 400px)", blur: 0 },
   { key: "father", photo: photos.fatherDaughter, x: "min(62vw, 560px)", y: "20svh", z: -760, w: "min(50vw, 420px)", blur: 1 },
   { key: "mother", photo: photos.motherDaughter, x: "max(-74vw, -700px)", y: "-22svh", z: -1040, w: "min(52vw, 440px)", blur: 2 },
 ];
@@ -40,9 +40,7 @@ export function Family() {
         const pass = (-l.z / TRAVEL) * 0.78; // when the camera reaches it
         tl.to(q(`[data-layer="${l.key}"]`), { opacity: 0, duration: 0.08 }, Math.max(0, pass - 0.1));
       });
-      tl.fromTo(q("[data-shoes-caption]"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0.12)
-        .to(q("[data-shoes-caption]"), { opacity: 0, duration: 0.06 }, 0.26)
-        .fromTo(q("[data-hero-edge]"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.78)
+      tl.fromTo(q("[data-hero-edge]"), { opacity: 0 }, { opacity: 1, duration: 0.1 }, 0.78)
         .fromTo(q("[data-hero] img"), { scale: 1.12 }, { scale: 1, duration: 0.22 }, 0.78);
     },
     revealAt: 0.8,
@@ -65,11 +63,6 @@ export function Family() {
               style={{ "--x": l.x, "--y": l.y, "--z": `${l.z}px`, "--w": l.w, "--blur": `${l.blur}px` } as CSSProperties}
             >
               <Picture photo={l.photo} className={`photo ${s.card}`} sizes="50vw" />
-              {l.caption && (
-                <figcaption className={`${s.layerCaption} on-photo`} data-shoes-caption>
-                  {l.caption}
-                </figcaption>
-              )}
             </figure>
           ))}
           <figure className={`${s.layer} ${s.hero}`} style={{ "--x": "0vw", "--y": "-6svh", "--z": `${HERO_Z}px`, "--w": "min(82vw, 46svh)", "--blur": "0px" } as CSSProperties}>

@@ -41,12 +41,10 @@ for entry in "${PHOTOS[@]}"; do
   export_one "$SRC/${entry#*:}" "${entry%%:*}"
 done
 
-# Baby shoes: object image from the previous site (legacy/assets), kept per docs/assets.md.
-export_one "$ROOT/legacy/assets/baby-shoes.jpeg" "baby-shoes"
-
 # Real couple photos from the August site (digisyn-co/helsonandluna), originals in docs/reference/august.
 export_one "$ROOT/docs/reference/august/couple-beach.jpg" "couple-beach"
 export_one "$ROOT/docs/reference/august/couple-coast.jpg" "couple-coast"
+export_one "$ROOT/docs/reference/august/family-selfie.jpg" "family-selfie"
 
 # Monogram emblem: the transparent "HELSON & LUNA" artwork, exact pixels, cropped above
 # its printed text line (names are set as live type; its "12.12 2026" date is wrong —
