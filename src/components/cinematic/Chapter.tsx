@@ -21,7 +21,9 @@ export const Chapter = forwardRef<HTMLElement, Props>(function Chapter({ id, lab
     <section
       ref={ref}
       id={id}
-      data-snap
+      // Snap only to screen-sized pinned chapters; long reading chapters scroll freely
+      // (snapping inside them could skip names or RSVP fields).
+      data-snap={pinned ? "" : undefined}
       aria-label={label}
       tabIndex={-1}
       className={["chapter", className].filter(Boolean).join(" ")}

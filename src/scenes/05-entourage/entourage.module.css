@@ -1,0 +1,77 @@
+.flow {
+  display: grid;
+  justify-items: center;
+  gap: 2.4rem;
+  max-width: 44rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.header {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+}
+.title {
+  font-size: clamp(2.6rem, 12vw, 4.6rem);
+  line-height: 1;
+}
+
+.ornament {
+  width: min(62vw, 240px);
+  height: auto;
+}
+
+/* Two columns even on phones: bridesmaids beside groomsmen, bride's side beside groom's. */
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1rem;
+  width: 100%;
+  align-items: start;
+}
+
+.role {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+}
+.role ul,
+.column {
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+.role li,
+.column li {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+  line-height: 1.25;
+  color: var(--ivory);
+  text-wrap: balance;
+}
+
+.block {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  justify-items: center;
+}
+
+.stack {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1rem;
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

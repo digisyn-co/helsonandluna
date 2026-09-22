@@ -42,6 +42,23 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 | Contact | "Questions? Write to us anytime." (same mailto) | ❌ Same broken address. `TODO(content)` |
 | Countdown | Live days / hours / minutes / seconds, targeting **`2026-12-17T14:00:00+08:00`** (2:00 PM Manila) in the previous site's code | ⚠ Contradicts the ceremony time "To be confirmed". The countdown keeps this target, but 2:00 PM is never displayed as the ceremony time. `TODO(content)`: confirm the ceremony time and the countdown target |
 
+## Entourage (added 2026-09-22, from the couple's text.txt)
+Rendered from `src/content/entourage.ts`, shown before the Ceremony as "The Entourage".
+- **Parents of the Bride:** Alicia B Tenefrancia, Fernando T Tenefrancia
+- **Parents of the Groom:** Helen P Lamigo, Wilson A Lamigo
+- **Best Man:** John Lamigo. **Maid of Honor:** Ma Freda Tribunal
+- **Bridesmaids:** Alyssa Nicole Tenefrancia, Brielle Alizel Tenefrancia, Ma. Angelica Lauron, Lizette Jane Lucas
+- **Groomsmen:** Joseph Foong, Juan Paulo Tenefrancia, Sean Warquin Lamigo, Isaac Raymon Lucas
+- **Junior Bridesmaids:** Shatacia Quinn Sevilla, Cassie Kelly Infante
+- **Junior Groomsmen:** Nicholas Tenefrancia, Azriel Jaxith Lamigo, Marcus Yuri Tenefrancia
+- **Primary Sponsors** (two columns, order as supplied, not re-paired):
+  - Column 1: Gina Lamigo Lucas, Ma. Jeana Fontanillas, Hilda Maquiling, Romela Dupit, Norma Elardo, Mary Koh, Minviluz Hojilla, Josie Galvez
+  - Column 2: Ramon Lucas, Nemesio Fontanillas, Edwin Maquiling, Arnold Dupit, Philip Elardo, Leo Elangos, Nilo Hojilla, Giovanne Galvez, Glenda Amor, Meriam Lamigo
+- **Secondary Sponsors:** Cord, Jay Van Tenefrancia & Giselle May Tenefrancia · Candle, Kenn Raymir Tenefrancia & Krisanteen Maquiling · Veil, Herbert Gajo & Christine Joy Gajo
+- **Flower Girls:** Aislah Fayre Gajo, Kaelsley Ember Infante · **Ring Bearer:** Noah Tenefrancia · **Bible Bearer:** Christoffer Eli Gajo · **Coin Bearer:** Cirgel Juaquin Principe
+
+Corrections made: label typos only ("Bestman", "brisdesmaid", "Coin beare"); double spaces in "Lizette Jane Lucas" and "Romela Dupit". `TODO(content)`: please double-check the spellings of "Shatacia" and "Kaelsley".
+
 ## Story copy (keep, may be lightly re-sequenced per scene)
 - **Their Story:** "Two lives. One beautiful story." / "Two people who found each other in the ordinary hours — a shared table, a long afternoon, a garden with the light going gold. In December they will stand together in Iloilo and make it permanent."
 - **Family:** "Before the wedding, there was a life already filled with love." / "The smallest pair of shoes, kept all these years." / "A daughter, a home, a decade of ordinary mornings. The wedding is not the beginning of the story. It is the vow written over one already lived."

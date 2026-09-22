@@ -23,7 +23,7 @@ const PORT = 9333;
 // [scene id, pinned progress 0..1 at which the chapter is fully composed]
 const SCENES = [
   ["invitation", 0], ["beginning", 0.95], ["two-of-us", 0.9], ["promise", 0.66], ["family", 0.97],
-  ["ceremony", 0.7], ["celebration", 0.75], ["details", 0], ["closing", 1],
+  ["entourage", 0], ["ceremony", 0.7], ["celebration", 0.75], ["details", 0], ["closing", 1],
 ];
 // Optional custom frames: QA_FRAMES="scene:t,scene:t" (overrides the default composed frames).
 const CUSTOM = process.env.QA_FRAMES?.split(",").map((f) => { const [id, t] = f.split(":"); return [id, Number(t)]; });

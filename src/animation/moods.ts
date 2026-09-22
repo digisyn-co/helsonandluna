@@ -20,6 +20,7 @@ export const MOODS: Record<SceneId, Mood> = {
   "two-of-us": { skyTop: "#111a38", skyBottom: "#46558d", haze: 0.7, rays: 0.25, dust: 0.3, dustMotion: 0.3 },
   promise: { skyTop: "#05070f", skyBottom: "#0c1227", haze: 0.25, rays: 0.0, dust: 0.15, dustMotion: 0.1 },
   family: { skyTop: "#151d3b", skyBottom: "#58689e", haze: 0.75, rays: 0.3, dust: 0.35, dustMotion: 0.35 },
+  entourage: { skyTop: "#10183a", skyBottom: "#2b3868", haze: 0.35, rays: 0.1, dust: 0.15, dustMotion: 0.15 },
   ceremony: { skyTop: "#29355f", skyBottom: "#8290c0", haze: 0.9, rays: 0.6, dust: 0.3, dustMotion: 0.25 },
   celebration: { skyTop: "#1a2246", skyBottom: "#6a6f9f", haze: 0.6, rays: 0.3, dust: 0.7, dustMotion: 0.8 },
   details: { skyTop: "#0c1227", skyBottom: "#1b2448", haze: 0.3, rays: 0.0, dust: 0.12, dustMotion: 0.1 },

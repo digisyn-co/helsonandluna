@@ -304,6 +304,18 @@ html[data-motion="full"] [data-reveal] {
   gap: 0.35rem 1rem;
   pointer-events: none;
 }
+/* Soft fade behind the progress UI so long chapters never collide with it. */
+.progress::before {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(var(--safe-top) + 5.75rem);
+  background: linear-gradient(180deg, rgb(7 10 22 / 0.96) 0%, rgb(7 10 22 / 0.9) 50%, rgb(7 10 22 / 0.55) 75%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+}
 .progress__label {
   font-size: 0.66rem;
   letter-spacing: 0.26em;

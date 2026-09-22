@@ -9,6 +9,7 @@ export const SCENES = [
   { id: "two-of-us", title: "The Two of Us", length: 2 },
   { id: "promise", title: "The Promise", length: 2.4 },
   { id: "family", title: "Family", length: 2.4 },
+  { id: "entourage", title: "The Entourage", length: 1 },
   { id: "ceremony", title: "The Ceremony", length: 1.8 },
   { id: "celebration", title: "The Celebration", length: 1.8 },
   { id: "details", title: "The Details", length: 1 },
