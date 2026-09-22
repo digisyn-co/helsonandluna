@@ -98,3 +98,14 @@ Consecutive frames are near-duplicate bursts; "(alt)" rows are backups. Final se
 | `AR506301.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.1 MB | Father leaning to daughter, mother behind, playful | faces centre | 06 Celebration | crop x≈50% | — |
 | `AR506303.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.6 MB | Father, daughter, mother kneeling, laughing | faces centre | 06 Celebration (hero candidate) | crop x≈55% | energy lift |
 | `AR506307.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.2 MB | Family playful, laughing | faces centre-left | 06 (alt) | crop x≈45% | — |
+## Transition clips: Google Flow (added 2026-09-22)
+Generated in Google Flow with **Veo 3.1 Fast**: 720×1280, 8 s, 9:16, 20 credits each (80 total). Re-encoded for the web to 540×960 H.264, audio removed, faststart, with a WebP poster each. Files are in `public/clips/`.
+
+| Clip | Chapter | Web size | Content | Notes |
+|---|---|---|---|---|
+| `ring.mp4` | 01 The Beginning | 928 KB | Camera passes through a gold ring into a rose garden at dawn | Replaces the gold-circle aperture while it plays |
+| `reflection.mp4` | 03 → 04 | 316 KB | Gold bands on midnight silk; the highlight blooms into golden bokeh | Hands off to the exit flare |
+| `chapel.mp4` | 05 The Ceremony | 345 KB | Morning light through arched stained glass | **Generic footage, not St. Clement's.** Hides the line-art while present. `TODO(content)`: a real photo of the venue would be more honest |
+| `twilight.mp4` | 08 The Closing | 366 KB | Rising past treetops into a lavender twilight with petals | Sits behind the monogram |
+
+Clips are an enhancement only (`TransitionClip`). They load when their chapter is near, play once, and are **skipped** for reduced motion, low-power/data-saver and the low tier, where the code-built transition plays instead. QA: `?tier=medium` pins the tier so clips show in headless or hidden browsers.

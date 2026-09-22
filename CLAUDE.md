@@ -11,8 +11,8 @@ Mobile-first, scroll-driven 3D invitation. Next.js 16 (App Router) · React 19.2
 - **Mobile is the product.** Check 390×844 first, then 375 / 393 / 430 and 1440×900.
 - **Never invent wedding facts.** Everything renders from `src/content/`, mirroring `docs/content.md`. Unknowns stay `null` / `TODO(content)`.
 - **The monogram is exact.** Only the artwork's printed text line is cropped (outdated names/year). Animate around it; never redraw it.
-- **Information never waits on animation.** Details/RSVP never uses `[data-reveal]`; everything works without WebGL (`?nowebgl`) and with reduced motion (`?reduced`). `?lowpower` forces the low tier.
-- **People imagery = the real photo shoot only.** AI imagery only for objects (baby shoes, rings fallback still).
+- **Information never waits on animation.** Details/RSVP never uses `[data-reveal]`; everything works without WebGL (`?nowebgl`) and with reduced motion (`?reduced`). `?lowpower` forces the low tier; `?tier=low|medium|high` pins the tier for QA.
+- **People imagery = real photos only** (pro shoot + August couple photos). AI imagery is limited to objects and atmosphere: the rings fallback still and the four Google Flow transition clips in `public/clips` (see docs/assets.md). Clips are optional enhancements: never make information depend on them.
 - Don't claim a Spline scene or MCP exists unless created and verified. The Spline MCP is **not** installed; 3D uses the R3F fallback.
 
 ## Architecture

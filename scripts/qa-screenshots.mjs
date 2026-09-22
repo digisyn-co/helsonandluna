@@ -6,6 +6,7 @@
  *
  *   pnpm dev            # in another terminal
  *   node scripts/qa-screenshots.mjs [url] [outDir]
+ *   QA_FRAMES="beginning:0.2,promise:0.8" QA_VIEWPORTS=390x844 node scripts/qa-screenshots.mjs "http://localhost:3200/?tier=medium" docs/qa/clips
  *
  * Output: docs/qa/<viewport>-<scene>.png (default)
  */
@@ -24,13 +25,18 @@ const SCENES = [
   ["invitation", 0], ["beginning", 0.95], ["two-of-us", 0.9], ["promise", 0.66], ["family", 0.97],
   ["ceremony", 0.7], ["celebration", 0.75], ["details", 0], ["closing", 1],
 ];
-const VIEWPORTS = [
+// Optional custom frames: QA_FRAMES="scene:t,scene:t" (overrides the default composed frames).
+const CUSTOM = process.env.QA_FRAMES?.split(",").map((f) => { const [id, t] = f.split(":"); return [id, Number(t)]; });
+if (CUSTOM) SCENES.splice(0, SCENES.length, ...CUSTOM);
+const ALL_VIEWPORTS = [
   { name: "375x812", width: 375, height: 812, mobile: true, scenes: ["invitation", "promise", "details"] },
   { name: "390x844", width: 390, height: 844, mobile: true, scenes: SCENES.map((s) => s[0]) },
   { name: "393x852", width: 393, height: 852, mobile: true, scenes: ["invitation", "family", "details"] },
   { name: "430x932", width: 430, height: 932, mobile: true, scenes: ["invitation", "celebration", "details"] },
   { name: "1440x900", width: 1440, height: 900, mobile: false, scenes: ["invitation", "two-of-us", "promise", "ceremony", "closing"] },
 ];
+const ONLY = process.env.QA_VIEWPORTS?.split(",");
+const VIEWPORTS = ALL_VIEWPORTS.filter((v) => !ONLY || ONLY.includes(v.name)).map((v) => (CUSTOM ? { ...v, scenes: SCENES.map((s) => s[0]) } : v));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -89,8 +95,8 @@ async function main() {
     await send("Emulation.setTouchEmulationEnabled", { enabled: vp.mobile });
     await send("Page.navigate", { url: URL_ });
     await sleep(9000); // loader + opening sequence
-    for (const id of vp.scenes) {
-      const t = SCENES.find((s) => s[0] === id)[1];
+    const frames = CUSTOM ? SCENES : vp.scenes.map((id) => SCENES.find((s) => s[0] === id));
+    for (const [id, t] of frames) {
       await send("Runtime.evaluate", {
         awaitPromise: true,
         expression: `(async () => {
@@ -102,7 +108,7 @@ async function main() {
         })()`,
       });
       const { data } = await send("Page.captureScreenshot", { format: "png" });
-      const file = join(OUT, `${vp.name}-${id}.png`);
+      const file = join(OUT, CUSTOM ? `${vp.name}-${id}-${t}.png` : `${vp.name}-${id}.png`);
       writeFileSync(file, Buffer.from(data, "base64"));
       console.log("saved", file);
     }

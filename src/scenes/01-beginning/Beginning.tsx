@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { TransitionClip, type ClipHandle } from "@/components/cinematic/TransitionClip";
 import { story } from "@/content/wedding";
 import { photos } from "@/content/images";
 import { ease } from "@/animation/tokens";
@@ -17,8 +18,11 @@ import s from "./beginning.module.css";
  */
 export function Beginning() {
   const root = useRef<HTMLElement>(null);
+  const clip = useRef<ClipHandle>(null);
 
   useChapterTimeline("beginning", root, {
+    // Flow clip: the camera passes through a gold ring into the garden sky.
+    onProgress: (t) => t > 0.02 && clip.current?.play(),
     scrub: (tl, q) => {
       tl.fromTo(q("[data-ring]"), { drawSVG: "50% 50%" }, { drawSVG: "0% 100%", duration: 0.25, ease: ease.camera }, 0)
         // Aperture opens: the circle grows past the screen edge as we move through it.
@@ -27,7 +31,9 @@ export function Beginning() {
         .fromTo(q("[data-aperture]"), { clipPath: "circle(0% at 50% 46%)" }, { clipPath: "circle(75% at 50% 46%)", duration: 0.55, ease: "power2.in" }, 0.2)
         .fromTo(q("[data-photo]"), { scale: 1.35, filter: "blur(10px)" }, { scale: 1.05, filter: "blur(0px)", duration: 0.6, ease: ease.camera }, 0.25)
         .fromTo(q("[data-haze]"), { opacity: 0.9 }, { opacity: 0.25, duration: 0.5 }, 0.3)
-        .to(q("[data-photo]"), { scale: 1, yPercent: -3, duration: 0.25 }, 0.85);
+        .to(q("[data-photo]"), { scale: 1, yPercent: -3, duration: 0.25 }, 0.85)
+        .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0)
+        .to(q("[data-clip-wrap]"), { opacity: 0, duration: 0.14 }, 0.5);
     },
     revealAt: 0.62,
     reveal: (tl, q) => {
@@ -41,6 +47,9 @@ export function Beginning() {
       <div className={s.aperture} data-aperture>
         <Picture photo={photos.walkAway} className={`photo ${s.photo}`} sizes="100vw" />
         <div className={s.haze} data-haze aria-hidden="true" />
+      </div>
+      <div className="clip" data-clip-wrap>
+        <TransitionClip ref={clip} name="ring" />
       </div>
       <div className={s.ringWrap} data-ring-wrap aria-hidden="true">
         <svg viewBox="0 0 200 200" className={s.ring}>

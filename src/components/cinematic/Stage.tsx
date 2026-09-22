@@ -4,7 +4,7 @@ import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
 import { visibleScenes } from "@/animation/sceneManager";
-import { stepTier, tierStore, useTier, webglOk } from "@/lib/device";
+import { fallbackTier, stepTier, tierStore, useTier, webglOk } from "@/lib/device";
 import { loadState } from "@/lib/loading";
 import { Atmosphere } from "./Atmosphere";
 
@@ -52,7 +52,7 @@ export default function Stage() {
             requestAnimationFrame(() => loadState.set({ ...loadState.get(), stage: true }));
           }}
         >
-          <PerformanceMonitor bounds={() => [45, 58]} flipflops={3} onDecline={() => stepTier(-1)} onIncline={() => stepTier(1)} onFallback={() => tierStore.set("low")} />
+          <PerformanceMonitor bounds={() => [45, 58]} flipflops={3} onDecline={() => stepTier(-1)} onIncline={() => stepTier(1)} onFallback={fallbackTier} />
           <Atmosphere />
           <SceneMounts />
         </Canvas>

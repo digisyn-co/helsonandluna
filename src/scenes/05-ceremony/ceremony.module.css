@@ -89,3 +89,13 @@
   text-decoration: none;
   color: var(--gold-200);
 }
+
+/* Real light through a chapel: fades into the sky so the details stay legible. */
+.clip {
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 88%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 88%);
+}
+/* The line-art church is the fallback: with the real clip present it steps aside. */
+.pin:has(video) .archWrap {
+  visibility: hidden;
+}

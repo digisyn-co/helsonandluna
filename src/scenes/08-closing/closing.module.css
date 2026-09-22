@@ -64,3 +64,9 @@ html[data-motion="full"] .mono {
   margin-top: 0.8rem;
   color: var(--ivory-muted);
 }
+
+/* Twilight clip sits behind the monogram, soft at the edges. */
+.clip {
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
+}

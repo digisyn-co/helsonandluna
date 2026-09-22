@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { TransitionClip, type ClipHandle } from "@/components/cinematic/TransitionClip";
 import { story } from "@/content/wedding";
 import { focusIn, revealLines } from "@/animation/text";
 import { useChapterTimeline } from "@/animation/useChapterTimeline";
@@ -15,12 +16,16 @@ import s from "./promise.module.css";
  */
 export function ThePromise() {
   const root = useRef<HTMLElement>(null);
+  const clip = useRef<ClipHandle>(null);
 
   useChapterTimeline("promise", root, {
+    // Flow clip: a highlight travels the bands and blooms into golden bokeh → Family.
+    onProgress: (t) => t > 0.68 && clip.current?.play(),
     scrub: (tl, q) => {
       tl.fromTo(q("[data-flare]"), { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "power2.in" }, 0.8)
         .to(q("[data-flare]"), { opacity: 0, duration: 0.04 }, 0.96)
-        .fromTo(q("[data-copy]"), { opacity: 1 }, { opacity: 0, duration: 0.08 }, 0.8);
+        .fromTo(q("[data-copy]"), { opacity: 1 }, { opacity: 0, duration: 0.08 }, 0.8)
+        .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.72);
     },
     revealAt: 0.5,
     reveal: (tl, q) => {
@@ -54,6 +59,9 @@ export function ThePromise() {
           <br />
           <em>{story.wedding.title[1]}</em>
         </h2>
+      </div>
+      <div className="clip" data-clip-wrap>
+        <TransitionClip ref={clip} name="reflection" />
       </div>
       <div className={s.flare} data-flare aria-hidden="true" />
     </Chapter>

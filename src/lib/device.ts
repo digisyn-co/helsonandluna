@@ -36,7 +36,16 @@ function supportsWebGL() {
   }
 }
 
+/** QA override: ?tier=low|medium|high pins the tier (PerformanceMonitor won't move it). */
+const forcedTier = (): Tier | null => {
+  if (typeof window === "undefined") return null;
+  const t = new URLSearchParams(location.search).get("tier");
+  return t === "low" || t === "medium" || t === "high" ? t : null;
+};
+
 function initialTier(env: Env): Tier {
+  const forced = forcedTier();
+  if (forced) return forced;
   if (env.lowPower) return "low";
   if (env.coarse) return (navigator.hardwareConcurrency ?? 4) >= 8 ? "medium" : "low";
   return "high";
@@ -48,9 +57,16 @@ export const tierStore = createStore<Tier>(initialTier(env));
 export const webglOk = createStore<boolean>(env.webgl);
 
 export function stepTier(direction: -1 | 1) {
+  if (forcedTier()) return;
   if (env.lowPower && direction === 1) return; // never climb out of low-power mode
   const i = ORDER.indexOf(tierStore.get());
   tierStore.set(ORDER[Math.min(ORDER.length - 1, Math.max(0, i + direction))]);
+}
+
+/** Persistent frame-rate trouble: drop straight to low (unless QA pinned the tier). */
+export function fallbackTier() {
+  if (forcedTier()) return;
+  tierStore.set("low");
 }
 
 export function useTier() {
