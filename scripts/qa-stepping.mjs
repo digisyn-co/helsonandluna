@@ -13,7 +13,7 @@
  *   pnpm dev            # in another terminal
  *   node scripts/qa-stepping.mjs [url]
  *   QA_TOUCH=1 node scripts/qa-stepping.mjs    # phone viewport with touch swipes
- *   QA_FILM=family node scripts/qa-stepping.mjs   # also film the step into that chapter → docs/qa/step/
+ *   QA_FILM=family node scripts/qa-stepping.mjs   # also film the step into that chapter → docs/qa/step/ (QA_FILM_FRAMES, every 220 ms)
  */
 import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
@@ -123,14 +123,44 @@ async function main() {
   await send("Page.navigate", { url: URL_ });
   await sleep(3000);
   // Frame timing while gliding: per step, average fps and the worst frame.
-  await evaluate(`window.__glides = []; let cur = null, last = 0;
+  const SAMPLER = `window.__glides = []; let cur = null, last = 0;
     const f = (t) => { const moving = document.documentElement.dataset.step === "moving";
       if (moving && !cur) { cur = { to: "", n: 0, worst: 0, t0: t }; last = t; }
       else if (moving) { cur.n++; cur.worst = Math.max(cur.worst, t - last); last = t; }
       else if (cur) { cur.to = document.querySelector(".progress__title")?.textContent; cur.fps = Math.round(cur.n / ((t - cur.t0) / 1000)); __glides.push(cur); cur = null; }
       requestAnimationFrame(f); };
-    requestAnimationFrame(f); true`);
+    requestAnimationFrame(f); true`;
+  await evaluate(SAMPLER);
   console.log(`viewport ${VP.width}x${VP.height} ${TOUCH ? "touch" : "wheel"} · waiting for the opening: ${await waitIdle(20000)} ms more`);
+
+  // Film the step into a chapter first, on a fresh load (optional), then reload for the checks.
+  if (FILM) {
+    const target = ORDER.findIndex((t) => t.toLowerCase().includes(FILM.toLowerCase()));
+    mkdirSync("docs/qa/step", { recursive: true });
+    // Get to the chapter before the target (Home first if we're already past it).
+    if (ORDER.indexOf((await state()).title) > target - 1) {
+      await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Home", code: "Home", windowsVirtualKeyCode: 36 });
+      await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Home", code: "Home", windowsVirtualKeyCode: 36 });
+      await sleep(300);
+      await waitIdle();
+    }
+    while ((await state()).title !== ORDER[target - 1]) { await gesture(1); await waitIdle(); }
+    await sleep(400);
+    const film = gesture(1);
+    const frames = Number(process.env.QA_FILM_FRAMES || 14);
+    for (let k = 0; k < frames; k++) {
+      const { data } = await send("Page.captureScreenshot", { format: "jpeg", quality: 55 });
+      writeFileSync(join("docs/qa/step", `${FILM}-${String(k).padStart(2, "0")}.jpg`), Buffer.from(data, "base64"));
+      await sleep(220);
+    }
+    await film;
+    await waitIdle();
+    console.log(`filmed the step into ${ORDER[target]} → docs/qa/step/ (${frames} frames)`);
+    await send("Page.reload");
+    await sleep(3000);
+    await waitIdle(20000);
+    await evaluate(SAMPLER);
+  }
 
   // 1. One gesture = one chapter.
   let s = await state();
@@ -158,22 +188,6 @@ async function main() {
   await waitIdle();
   s = await state();
   check(TOUCH ? "a long swipe moves one chapter" : "a hard wheel spin moves one chapter", ORDER.indexOf(s.title) === from + 1, `${ORDER[from]} → ${s.title}`);
-
-  // 4. Film the step into a chapter (optional).
-  if (FILM) {
-    const target = ORDER.findIndex((t) => t.toLowerCase().includes(FILM.toLowerCase()));
-    mkdirSync("docs/qa/step", { recursive: true });
-    while ((await state()).title !== ORDER[target - 1]) { await gesture(1); await waitIdle(); }
-    const film = gesture(1);
-    for (let k = 0; k < 14; k++) {
-      const { data } = await send("Page.captureScreenshot", { format: "jpeg", quality: 55 });
-      writeFileSync(join("docs/qa/step", `${FILM}-${String(k).padStart(2, "0")}.jpg`), Buffer.from(data, "base64"));
-      await sleep(220);
-    }
-    await film;
-    await waitIdle();
-    console.log(`filmed the step into ${ORDER[target]} → docs/qa/step/ (14 frames)`);
-  }
 
   // 5. Step through everything; each chapter once, in order. Reading chapters: scroll inside first.
   const visited = [(await state()).title];

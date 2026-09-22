@@ -8,10 +8,15 @@
  * `rest` is where a pinned chapter settles between scrolls (pinned progress 0..1): its
  * composed frame, after its intro and before its exit. One scroll glides rest → next rest,
  * so every transition in between plays in full (see animation/sceneStepper.ts).
+ * `glide` (optional, seconds) overrides the step duration between this chapter and the one
+ * before it, both directions, for transitions that need more time to be seen. `pace` shapes
+ * that glide: [time fraction, distance fraction] points (smoothed, mirrored going back).
  */
 export const SCENES = [
   { id: "invitation", title: "The Invitation", length: 1, rest: 0 },
-  { id: "beginning", title: "The Beginning", length: 2, rest: 1 },
+  // Dissolve in ~0.8 s, then slow right down so the ring clip plays in full view (ring → through
+  // → garden) before the aperture opens onto the photo.
+  { id: "beginning", title: "The Beginning", length: 2, rest: 1, glide: 6, pace: [[0.13, 0.5], [0.75, 0.75]] },
   { id: "two-of-us", title: "The Two of Us", length: 2, rest: 1 },
   { id: "family", title: "Family", length: 2.4, rest: 1 },
   { id: "promise", title: "The Promise", length: 2.4, rest: 0.75 },

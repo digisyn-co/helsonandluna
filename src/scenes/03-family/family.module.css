@@ -43,8 +43,9 @@
   object-fit: cover;
 }
 
+/* The hero is a landscape family portrait: the frame keeps all three of them in shot. */
 .hero .card {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 2;
 }
 .heroEdge {
   position: absolute;

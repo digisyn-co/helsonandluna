@@ -19,7 +19,7 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 | Venue | **St. Clements Church** | ⚠ The map link on the same page searches **"St. Clement Church"** (singular). Confirm the official spelling. `TODO(content)` |
 | Address | La Paz, Iloilo City, Philippines | ✔ |
 | Date | Thursday, December 17, 2026 | ✔ |
-| Time | **"To be confirmed"** | `TODO(content)`: ceremony start time |
+| Time | **2:30 PM** | ✅ Confirmed 2026-09-22 |
 | Map | Google Maps search: `St. Clement Church La Paz Iloilo City` | ✔ (keep the link; update if the spelling changes) |
 | Coordinates shown | 10.7215° N, 122.5630° E | ⚠ Displayed but not verified against the venue. `TODO(content)`: confirm, or drop the coordinates |
 
@@ -40,7 +40,7 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 | RSVP deadline | **October 31, 2026** ("Kindly respond by October 31, 2026 so we can hold a seat for you in the garden.") | ✔ |
 | RSVP method | `mailto:rsvp@helsonandluna.com` (subject "RSVP — Helson & Luna, Dec 17 2026") | ❌ **Broken.** `helsonandluna.com` has **no DNS records at all** (no MX, no A) as of 2026-09-22, so every RSVP email bounces. `TODO(content)`: working RSVP method |
 | Contact | "Questions? Write to us anytime." (same mailto) | ❌ Same broken address. `TODO(content)` |
-| Countdown | Live days / hours / minutes / seconds, targeting **`2026-12-17T14:00:00+08:00`** (2:00 PM Manila) in the previous site's code | ⚠ Contradicts the ceremony time "To be confirmed". The countdown keeps this target, but 2:00 PM is never displayed as the ceremony time. `TODO(content)`: confirm the ceremony time and the countdown target |
+| Countdown | Live days / hours / minutes / seconds, targeting **`2026-12-17T14:30:00+08:00`** (2:30 PM Manila, the ceremony start) | ✅ Confirmed 2026-09-22 (the previous site used 2:00 PM) |
 
 ## Entourage (added 2026-09-22, from the couple's text.txt)
 Rendered from `src/content/entourage.ts`, shown before the Ceremony as "The Entourage".
@@ -75,7 +75,7 @@ Corrections made: label typos only ("Bestman", "brisdesmaid", "Coin beare"); dou
 
 ## Still open
 1. **Venue spelling:** "St. Clements" vs "St. Clement". `TODO(content)`
-2. **Ceremony time:** "To be confirmed" (and the countdown's 2:00 PM target). `TODO(content)`
+2. ~~**Ceremony time**~~ ✅ 2:30 PM, confirmed 2026-09-22; the countdown targets it.
 3. **Reception time:** only "Evening". `TODO(content)`
 4. **Coordinates:** 10.7215° N, 122.5630° E, unverified. They're not shown on the new site. `TODO(content)`
 5. **Contact:** "Questions? Write to us anytime." had no working address. `TODO(content)`

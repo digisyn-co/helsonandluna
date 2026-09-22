@@ -14,9 +14,8 @@ export const couple = {
 export const wedding = {
   /** Ceremony day, Asia/Manila. Countdown target uses the ceremony time once known. */
   dateISO: "2026-12-17",
-  // TODO(content): the previous site's countdown targets 14:00 Manila time, yet the page says the
-  // ceremony time is "To be confirmed". Kept as-is for the countdown only; never shown as a time.
-  countdownISO: "2026-12-17T14:00:00+08:00",
+  /** Ceremony start, 2:30 PM Manila (confirmed 2026-09-22). */
+  countdownISO: "2026-12-17T14:30:00+08:00",
   timeZone: "Asia/Manila",
   dateLong: "Thursday, December 17, 2026",
   dateShort: "December 17, 2026",
@@ -33,8 +32,8 @@ export const ceremony = {
   area: "La Paz, Iloilo City",
   country: "Philippines",
   date: "Thursday, December 17, 2026",
-  // TODO(content): ceremony start time is "To be confirmed" on the current site.
-  time: null as string | null,
+  /** Confirmed 2026-09-22. */
+  time: "2:30 PM" as string | null,
   /** Wording the current site uses while the time is unknown. */
   timePending: "To be confirmed",
   mapUrl: "https://www.google.com/maps/search/?api=1&query=St.+Clement+Church+La+Paz+Iloilo+City",

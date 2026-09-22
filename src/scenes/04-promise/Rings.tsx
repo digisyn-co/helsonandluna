@@ -97,7 +97,10 @@ export default function Rings() {
     const fit = landscape ? 0.74 : Math.min(1, aspect / 0.8);
     const g = group.current;
     // Only exist inside this chapter's window — never as silhouettes over neighbours.
-    const inWindow = sceneFrames.promise.progress > 0 && target < 0.985;
+    // …and only once The Promise has mostly dissolved in (screens scrolled since its top
+    // entered ≥ 0.75), so the unlit pair never shows as a dark silhouette over Family.
+    const arrived = sceneFrames.promise.progress * (LENGTH + 1) >= 0.75;
+    const inWindow = arrived && target < 0.985;
     if (g) g.visible = inWindow;
     if (g) {
       g.scale.setScalar((0.82 + emerge * 0.18) * fit);

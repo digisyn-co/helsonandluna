@@ -45,6 +45,8 @@ done
 export_one "$ROOT/docs/reference/august/couple-beach.jpg" "couple-beach"
 export_one "$ROOT/docs/reference/august/couple-coast.jpg" "couple-coast"
 export_one "$ROOT/docs/reference/august/family-selfie.jpg" "family-selfie"
+# The meadow portrait with the flower basket, chosen by the couple for Family (2026-09-22).
+export_one "$ROOT/docs/reference/family-meadow.jpg" "family-meadow"
 
 # Monogram emblem: the transparent "HELSON & LUNA" artwork, exact pixels, cropped above
 # its printed text line (names are set as live type; its "12.12 2026" date is wrong —

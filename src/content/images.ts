@@ -34,6 +34,7 @@ export const photos = {
   // Real couple photos from the August site (digisyn-co/helsonandluna).
   coupleBeach: { name: "couple-beach", alt: "The couple laughing on a beach, one carrying the other piggyback", width: 1440, height: 1800, focus: "50% 22%" },
   coupleCoast: { name: "couple-coast", alt: "The couple standing together on a sunny coastal path", width: 1440, height: 1080, focus: "55% 45%" },
+  familyMeadow: { name: "family-meadow", alt: "The couple and their daughter sitting in a sunlit meadow with a basket of flowers", width: 1536, height: 1024, focus: "50% 40%" },
   familySelfie: { name: "family-selfie", alt: "A family selfie: the couple smiling with their daughter as a toddler in a sun hat", width: 960, height: 720, focus: "50% 45%" },
 } satisfies Record<string, Photo>;
 

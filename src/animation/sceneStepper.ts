@@ -67,6 +67,37 @@ function canScroll(el: HTMLElement | null, dir: 1 | -1) {
   return dir > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 2 : el.scrollTop > 1;
 }
 
+type Pace = readonly (readonly [number, number])[];
+
+/** Monotone cubic ease through (0,0) → points → (1,1), starting and ending at rest, so a
+ *  step can spend its time where the transition needs it (Fritsch–Carlson, no overshoot). */
+function paceEase(points: Pace) {
+  const xs = [0, ...points.map((p) => p[0]), 1];
+  const ys = [0, ...points.map((p) => p[1]), 1];
+  const n = xs.length;
+  const d = xs.slice(0, -1).map((x, i) => (ys[i + 1] - ys[i]) / (xs[i + 1] - x));
+  const m = xs.map((_, i) => (i === 0 || i === n - 1 ? 0 : d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2));
+  for (let i = 0; i < n - 1; i++) {
+    const a = m[i] / d[i];
+    const b = m[i + 1] / d[i];
+    const r = a * a + b * b;
+    if (r > 9) {
+      const k = 3 / Math.sqrt(r);
+      m[i] = k * a * d[i];
+      m[i + 1] = k * b * d[i];
+    }
+  }
+  return (x: number) => {
+    let i = 0;
+    while (i < n - 2 && x > xs[i + 1]) i++;
+    const h = xs[i + 1] - xs[i];
+    const t = (x - xs[i]) / h;
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h * m[i + 1];
+  };
+}
+
 function hold(cap: number = step.maxHold) {
   setPhase("holding");
   holdStart = performance.now();
@@ -81,6 +112,7 @@ export function goTo(index: number, opts: GoOpts = {}) {
   const y = stopY(i);
   if (y === null) return;
   const from = window.scrollY;
+  const prev = current;
   const dir = i >= current ? 1 : -1;
   // A reading chapter is entered at the edge you arrive from.
   const inner = scrollerOf(i);
@@ -94,13 +126,23 @@ export function goTo(index: number, opts: GoOpts = {}) {
     return;
   }
   const screens = Math.abs(y - from) / vh();
-  const duration = opts.duration ?? (env.reducedMotion ? step.reduced : clamp(step.base + step.perScreen * screens, step.min, step.max));
+  // A one-chapter step can have its own pace (`glide` on the later chapter of the pair).
+  const later = SCENES[Math.max(i, prev)] as { glide?: number; pace?: Pace };
+  const single = Math.abs(i - prev) === 1;
+  const paced = single ? later.glide : undefined;
+  let pace: ((x: number) => number) | null = null;
+  if (single && later.pace && !env.reducedMotion) {
+    const f = paceEase(later.pace);
+    pace = dir > 0 ? f : (x) => 1 - f(1 - x); // mirrored going back
+  }
+  const duration = opts.duration ?? (env.reducedMotion ? step.reduced : (paced ?? clamp(step.base + step.perScreen * screens, step.min, step.max)));
   setPhase("moving");
   proxy.y = from;
   tween = gsap.to(proxy, {
     y,
     duration,
-    ease: env.reducedMotion ? "sine.inOut" : step.ease,
+    // A paced step moves evenly (or along its own `pace`), so its key moment isn't rushed.
+    ease: pace ?? (env.reducedMotion || paced ? "sine.inOut" : step.ease),
     onUpdate: () => window.scrollTo(0, proxy.y),
     onComplete: () => hold(),
   });

@@ -2,7 +2,9 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef, useSyncExternalStore } from "react";
 import { env, tierStore } from "@/lib/device";
-import { registerSettle, visibleScenes } from "@/animation/sceneManager";
+import { registerSettle, sceneFrames, visibleScenes } from "@/animation/sceneManager";
+import type { SceneId } from "@/content/scenes";
+import { gsap } from "@/lib/gsap";
 
 /**
  * A short, muted, AI-generated transition clip (Google Flow · Veo 3.1). Clips are an
@@ -43,7 +45,19 @@ export const TransitionClip = forwardRef<ClipHandle, { name: string; className?:
     };
     check();
     const off = visibleScenes.subscribe(check);
-    return () => void off();
+    // Rewind once the chapter is fully off screen, so the clip plays again on every arrival.
+    const frame = sceneFrames[scene as SceneId];
+    const rewind = () => {
+      if (!played.current || !frame || (frame.progress > 0 && frame.progress < 1)) return;
+      played.current = false;
+      v.pause();
+      v.currentTime = 0;
+    };
+    gsap.ticker.add(rewind);
+    return () => {
+      off();
+      gsap.ticker.remove(rewind);
+    };
   }, [on]);
 
   // While it plays in view, the scene stepper waits for it (up to its hold cap).
@@ -67,7 +81,8 @@ export const TransitionClip = forwardRef<ClipHandle, { name: string; className?:
     },
   }));
 
-  if (!on) return null;
+  // Once started, a clip plays out even if the quality tier drops mid-glide.
+  if (!on && !played.current) return null;
 
   return (
     <video

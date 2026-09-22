@@ -65,9 +65,9 @@ export function Family() {
               <Picture photo={l.photo} className={`photo ${s.card}`} sizes="50vw" />
             </figure>
           ))}
-          <figure className={`${s.layer} ${s.hero}`} style={{ "--x": "0vw", "--y": "-6svh", "--z": `${HERO_Z}px`, "--w": "min(82vw, 46svh)", "--blur": "0px" } as CSSProperties}>
+          <figure className={`${s.layer} ${s.hero}`} style={{ "--x": "0vw", "--y": "-6svh", "--z": `${HERO_Z}px`, "--w": "min(90vw, 600px)", "--blur": "0px" } as CSSProperties}>
             <div className={`photo ${s.card}`} data-hero>
-              <Picture photo={photos.familyKneeling} className={s.fill} sizes="(max-width: 640px) 82vw, 440px" />
+              <Picture photo={photos.familyMeadow} className={s.fill} sizes="(max-width: 640px) 90vw, 600px" />
             </div>
             <span className={s.heroEdge} data-hero-edge aria-hidden="true" />
           </figure>
