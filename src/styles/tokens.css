@@ -1,0 +1,46 @@
+/* Design tokens — the single place for colour, type, spacing and motion values. */
+:root {
+  /* Palette (translated from docs/reference/theme-artwork.png) */
+  --midnight-950: #070a16;   /* opening darkness */
+  --midnight-900: #0c1227;
+  --midnight-800: #151d3b;
+  --dusty-700: #3a4775;
+  --dusty-500: #6f7fb3;      /* primary: ethereal dusty blue */
+  --dusty-300: #a9b4d8;
+  --dusty-100: #dde2f1;
+  --gold-600: #a8844e;       /* champagne gold, shadow side */
+  --gold-400: #d4b483;       /* champagne gold, lit */
+  --gold-200: #efdcb7;       /* specular */
+  --ivory: #f6f0e6;          /* type, highlights */
+  --ivory-muted: rgba(246, 240, 230, 0.72);
+  --ivory-faint: rgba(246, 240, 230, 0.5);
+  --blush: #e7c2c1;          /* accent, sparingly */
+  --lavender: #c7c1e0;       /* very subtle */
+
+  --gold-line: linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-200) 50%, var(--gold-400) 80%, transparent);
+
+  /* Type */
+  --font-display: var(--font-serif), "Times New Roman", serif;
+  --font-body: var(--font-sans), system-ui, sans-serif;
+  --text-meta: 0.72rem;      /* uppercase metadata */
+  --text-body: 1rem;         /* never below 16px on phones */
+  --text-lede: 1.125rem;
+  --text-h2: clamp(2.4rem, 11vw, 5.5rem);
+  --text-h1: clamp(3rem, 15vw, 8rem);
+  --tracking-meta: 0.28em;
+  --tracking-display: -0.01em;
+  --leading-body: 1.65;
+
+  /* Space + safe areas */
+  --gutter: max(1.5rem, env(safe-area-inset-left), env(safe-area-inset-right));
+  --safe-top: max(1rem, env(safe-area-inset-top));
+  --safe-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  --scene-h: 100svh;
+
+  /* Motion (mirrored in src/animation/tokens.ts for GSAP) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 0.4s;
+  --dur-base: 0.9s;
+  --dur-slow: 1.6s;
+}

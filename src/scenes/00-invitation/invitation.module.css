@@ -1,0 +1,101 @@
+.scene {
+  display: grid;
+  place-items: center;
+  height: var(--scene-h);
+  overflow: hidden;
+}
+
+.inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: calc(var(--safe-top) + 2.5rem) var(--gutter) calc(var(--safe-bottom) + 4rem);
+  will-change: transform, opacity;
+}
+
+.glimmer {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--gold-200);
+  box-shadow: 0 0 18px 6px rgb(239 220 183 / 0.55), 0 0 60px 20px rgb(212 180 131 / 0.18);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ornament {
+  width: min(62vw, 260px);
+  height: auto;
+  opacity: 0;
+}
+html[data-motion="reduced"] .ornament,
+html:not([data-motion]) .ornament {
+  opacity: 1;
+}
+
+.mono {
+  position: relative;
+  margin-top: -0.4rem;
+}
+
+.florals {
+  position: absolute;
+  inset: auto 0 16% 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.florals svg {
+  width: clamp(64px, 18vw, 120px);
+  height: auto;
+  opacity: 0;
+}
+html[data-motion="reduced"] .florals svg,
+html:not([data-motion]) .florals svg {
+  opacity: 1;
+}
+
+.names {
+  font-size: clamp(2.6rem, 13vw, 5.6rem);
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  margin-top: 0.4rem;
+}
+.names em {
+  font-size: 0.8em;
+}
+
+.date {
+  letter-spacing: 0.34em;
+  text-align: center;
+  white-space: nowrap;
+}
+/* Narrow phones: tighter tracking keeps "date · city" on one deliberate line. */
+@media (max-width: 400px) {
+  .date {
+    letter-spacing: 0.22em;
+  }
+}
+
+.cue {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: max-content;
+  bottom: var(--safe-bottom);
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+}
+.cueLine {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(var(--gold-400), transparent);
+}

@@ -1,0 +1,66 @@
+.pin {
+  place-items: center;
+}
+
+/* The ground we rise away from. */
+.ground {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 45%);
+  will-change: transform, opacity;
+}
+.groundPhoto {
+  position: absolute;
+  inset: 0;
+}
+html[data-motion="reduced"] .ground {
+  opacity: 0.35;
+}
+
+.florals {
+  position: absolute;
+  inset: auto 0 12% 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.florals svg {
+  width: clamp(70px, 20vw, 130px);
+  height: auto;
+}
+
+.content {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+  text-align: center;
+}
+.mono {
+  position: relative;
+}
+html[data-motion="full"] .mono {
+  opacity: 0;
+}
+.names {
+  font-size: clamp(2.4rem, 12vw, 5rem);
+  line-height: 1;
+  margin-top: 0.5rem;
+}
+.names em {
+  font-size: 0.8em;
+}
+.date {
+  letter-spacing: 0.34em;
+}
+.quote {
+  margin-top: 1.2rem;
+  font-size: clamp(1.5rem, 6.5vw, 2.4rem);
+  font-style: italic;
+  color: var(--ivory);
+}
+.sign {
+  margin-top: 0.8rem;
+  color: var(--ivory-muted);
+}

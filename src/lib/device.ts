@@ -1,0 +1,77 @@
+"use client";
+
+import { createStore } from "./store";
+
+export type Tier = "low" | "medium" | "high";
+
+/** Fidelity per tier. Scales detail, never the story. */
+export const TIER_PRESETS = {
+  low: { dpr: [1, 1.25] as [number, number], particles: 180, postfx: false, ringSegments: 96 },
+  medium: { dpr: [1, 1.75] as [number, number], particles: 420, postfx: true, ringSegments: 160 },
+  high: { dpr: [1, 2] as [number, number], particles: 900, postfx: true, ringSegments: 256 },
+} as const;
+
+const ORDER: Tier[] = ["low", "medium", "high"];
+
+type Env = { reducedMotion: boolean; coarse: boolean; lowPower: boolean; webgl: boolean };
+
+function detectEnv(): Env {
+  if (typeof window === "undefined") return { reducedMotion: false, coarse: true, lowPower: false, webgl: true };
+  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  const params = new URLSearchParams(location.search);
+  return {
+    reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches || params.has("reduced"),
+    coarse: matchMedia("(pointer: coarse)").matches,
+    lowPower: Boolean(nav.connection?.saveData) || (nav.deviceMemory ?? 8) <= 3 || params.has("lowpower"),
+    webgl: !params.has("nowebgl") && supportsWebGL(),
+  };
+}
+
+function supportsWebGL() {
+  try {
+    const c = document.createElement("canvas");
+    return Boolean(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+function initialTier(env: Env): Tier {
+  if (env.lowPower) return "low";
+  if (env.coarse) return (navigator.hardwareConcurrency ?? 4) >= 8 ? "medium" : "low";
+  return "high";
+}
+
+export const env: Env = detectEnv();
+export const tierStore = createStore<Tier>(initialTier(env));
+/** Flips false if WebGL fails at runtime (context loss, shader error) → static fallback. */
+export const webglOk = createStore<boolean>(env.webgl);
+
+export function stepTier(direction: -1 | 1) {
+  if (env.lowPower && direction === 1) return; // never climb out of low-power mode
+  const i = ORDER.indexOf(tierStore.get());
+  tierStore.set(ORDER[Math.min(ORDER.length - 1, Math.max(0, i + direction))]);
+}
+
+export function useTier() {
+  const tier = tierStore.use();
+  return { tier, ...TIER_PRESETS[tier] };
+}
+
+/** QA hooks: <html data-tier="…" data-webgl="…" data-motion="…"> */
+export function mirrorEnvToDom() {
+  const d = document.documentElement.dataset;
+  const sync = () => {
+    d.tier = tierStore.get();
+    d.webgl = String(webglOk.get());
+    d.motion = env.reducedMotion ? "reduced" : "full";
+    d.input = env.coarse ? "touch" : "pointer";
+  };
+  sync();
+  const a = tierStore.subscribe(sync);
+  const b = webglOk.subscribe(sync);
+  return () => {
+    a();
+    b();
+  };
+}
