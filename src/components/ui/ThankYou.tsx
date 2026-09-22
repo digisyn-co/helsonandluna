@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { env } from "@/lib/device";
 import { ease, dur } from "@/animation/tokens";
+import { blurred, focused } from "@/animation/fx";
 import { fadeUp, focusIn, revealLines } from "@/animation/text";
 import { ceremony, couple, reception, wedding } from "@/content/wedding";
 import { Monogram } from "@/components/cinematic/Monogram";
@@ -29,7 +30,7 @@ export function ThankYou({ open, name, attending, onClose }: Props) {
     const tl = gsap.timeline();
     tl.fromTo(d, { opacity: 0 }, { opacity: 1, duration: env.reducedMotion ? 0.4 : 0.9, ease: ease.fade });
     if (!env.reducedMotion) {
-      tl.fromTo(q("[data-mono]"), { opacity: 0, scale: 0.92, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: dur.slow, ease: ease.reveal, clearProps: "filter" }, 0.2)
+      tl.fromTo(q("[data-mono]"), { opacity: 0, scale: 0.92, ...blurred(10) }, { opacity: 1, scale: 1, ...focused(), duration: dur.slow, ease: ease.reveal, clearProps: "filter" }, 0.2)
         .fromTo(q(".monogram__sweep"), { xPercent: -80, opacity: 0 }, { xPercent: 80, opacity: 1, duration: dur.sweep, ease: ease.light }, 0.9)
         .to(q(".monogram__sweep"), { opacity: 0, duration: dur.base }, `>-${dur.base}`)
         .fromTo(q("[data-floral]"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: dur.slow, stagger: 0.12, ease: ease.reveal }, 0.6);

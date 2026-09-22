@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { gsap } from "@/lib/gsap";
 import { mirrorEnvToDom } from "@/lib/device";
-import { updateScenes } from "./sceneManager";
+import { updateScenes, visibleScenes } from "./sceneManager";
 import { initStepper, tickStepper } from "./sceneStepper";
 
 /**
@@ -19,6 +19,21 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     const unmirror = mirrorEnvToDom();
     const stopStepper = initStepper();
 
+    // Decode the images of chapters within reach ahead of time, so a glide never waits on
+    // a big photo decoding (images in hidden layers are otherwise decoded on first show).
+    const decoded = new Set<string>();
+    const predecode = () =>
+      visibleScenes.get().forEach((id) => {
+        if (decoded.has(id)) return;
+        decoded.add(id);
+        document.getElementById(id)?.querySelectorAll("img").forEach((img) => {
+          img.loading = "eager";
+          img.decode().catch(() => {});
+        });
+      });
+    predecode();
+    const offDecode = visibleScenes.subscribe(predecode);
+
     const tick = () => {
       updateScenes();
       tickStepper();
@@ -29,6 +44,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
     return () => {
       gsap.ticker.remove(tick);
       stopStepper();
+      offDecode();
       unmirror();
     };
   }, []);

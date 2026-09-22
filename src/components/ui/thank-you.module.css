@@ -132,3 +132,8 @@
     grid-template-columns: 1fr;
   }
 }
+
+:global(html[data-tier="low"]) .dialog::before {
+  mix-blend-mode: normal;
+  opacity: 0.16;
+}

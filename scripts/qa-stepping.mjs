@@ -14,6 +14,9 @@
  *   node scripts/qa-stepping.mjs [url]
  *   QA_TOUCH=1 node scripts/qa-stepping.mjs    # phone viewport with touch swipes
  *   QA_FILM=family node scripts/qa-stepping.mjs   # also film the step into that chapter → docs/qa/step/ (QA_FILM_FRAMES, every 220 ms)
+ *   QA_DEVICE=android QA_THROTTLE=4 QA_GL=soft node scripts/qa-stepping.mjs
+ *     # mid-range Android stand-in: 412×915 @2.625, Android UA, touch, CPU ÷4, software GPU (a weak GPU:
+ *     # absolute fps is pessimistic, use it to compare before/after). Also reports fps at rest per chapter.
  */
 import { spawn } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
@@ -23,15 +26,19 @@ import { join } from "node:path";
 const URL_ = process.argv[2] ?? "http://localhost:3200/";
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PORT = 9334;
-const TOUCH = Boolean(process.env.QA_TOUCH);
+const ANDROID = process.env.QA_DEVICE === "android";
+const TOUCH = Boolean(process.env.QA_TOUCH) || ANDROID;
+const THROTTLE = Number(process.env.QA_THROTTLE || 1);
+const SOFT_GL = process.env.QA_GL === "soft";
+const ANDROID_UA = "Mozilla/5.0 (Linux; Android 14; SM-A546B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36";
 const FILM = process.env.QA_FILM;
-const VP = TOUCH ? { width: 390, height: 844, mobile: true } : { width: 1440, height: 900, mobile: false };
+const VP = ANDROID ? { width: 412, height: 915, mobile: true, dpr: 2.625 } : TOUCH ? { width: 390, height: 844, mobile: true, dpr: 1 } : { width: 1440, height: 900, mobile: false, dpr: 1 };
 const ORDER = ["The Invitation", "The Beginning", "The Two of Us", "Family", "The Promise", "The Entourage", "The Ceremony", "The Celebration", "The Details", "The Closing"];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const chrome = spawn(CHROME, [
   "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "qa-step-"))}`,
-  "--no-first-run", "--no-default-browser-check", "--hide-scrollbars", "--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist", "about:blank",
+  "--no-first-run", "--no-default-browser-check", "--hide-scrollbars", ...(SOFT_GL ? ["--enable-unsafe-swiftshader", "--use-angle=swiftshader"] : ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"]), "about:blank",
 ], { stdio: "ignore" });
 
 let ws;
@@ -118,7 +125,9 @@ async function main() {
   });
   await send("Page.enable");
   await send("Runtime.enable");
-  await send("Emulation.setDeviceMetricsOverride", { width: VP.width, height: VP.height, deviceScaleFactor: 1, mobile: VP.mobile });
+  await send("Emulation.setDeviceMetricsOverride", { width: VP.width, height: VP.height, deviceScaleFactor: VP.dpr, mobile: VP.mobile });
+  if (ANDROID) await send("Emulation.setUserAgentOverride", { userAgent: ANDROID_UA, platform: "Linux armv8l", userAgentMetadata: { platform: "Android", platformVersion: "14", architecture: "arm", model: "SM-A546B", mobile: true, brands: [{ brand: "Chromium", version: "129" }] } });
+  if (THROTTLE > 1) await send("Emulation.setCPUThrottlingRate", { rate: THROTTLE });
   await send("Emulation.setTouchEmulationEnabled", { enabled: TOUCH });
   await send("Page.navigate", { url: URL_ });
   await sleep(3000);
@@ -169,17 +178,37 @@ async function main() {
   let s2 = await state();
   check("one gesture moves exactly one chapter", s2.title === ORDER[1], `${s.title} → ${s2.title}, glide+hold ${moveMs} ms`);
 
-  // 2. Keep gesturing through the whole glide and hold: still exactly one chapter.
+  // 2. Keep gesturing through the whole glide and hold. The rule: a gesture that BEGINS while
+  // the page is locked never moves it (one begun after it settled may — that's the next scroll).
+  // The page logs each gesture (phase when it began, when it ended) and each step start; every
+  // step is attributed to the last gesture that ended before it.
+  await evaluate(`(() => {
+    const root = document.documentElement;
+    window.__gest = []; window.__steps = [];
+    let cur = null, lastWheel = 0;
+    addEventListener("touchstart", () => { cur = { phase: root.dataset.step }; }, { capture: true });
+    addEventListener("touchend", () => { if (cur) { cur.end = performance.now(); window.__gest.push(cur); cur = null; } }, { capture: true });
+    addEventListener("wheel", () => { const now = performance.now(); if (now - lastWheel > 200) window.__gest.push({ phase: root.dataset.step, end: now }); lastWheel = now; }, { capture: true });
+    let prev = root.dataset.step;
+    new MutationObserver(() => { const now = root.dataset.step; if (now === "moving" && prev !== "moving") window.__steps.push(performance.now()); prev = now; }).observe(root, { attributes: true, attributeFilter: ["data-step"] });
+    return true; })()`);
   let from = ORDER.indexOf((await state()).title);
   await gesture(1);
-  let extra = 0;
+  await sleep(TOUCH ? 100 : 260);
   while ((await state()).step !== "idle") {
     await gesture(1);
-    extra++;
-    await sleep(100);
+    await sleep(TOUCH ? 100 : 260); // wheel: past the 200 ms gap, so each flick is its own gesture
   }
+  await waitIdle();
   s = await state();
-  check("gestures during a glide or hold never skip a chapter", ORDER.indexOf(s.title) === from + 1, `${extra} extra gestures while locked; ${ORDER[from]} → ${s.title}`);
+  const { gest, steps } = await evaluate("({ gest: window.__gest, steps: window.__steps })");
+  const culprits = steps.map((t) => gest.filter((g) => g.end <= t + 1).at(-1)).filter((g) => g && g.phase !== "idle");
+  const lockedCount = gest.filter((g) => g.phase !== "idle").length;
+  check(
+    "gestures during a glide or hold never skip a chapter",
+    culprits.length === 0 && lockedCount > 0,
+    `${gest.length} gestures, ${lockedCount} begun while locked, ${culprits.length} of those moved the page; ${steps.length} step(s): ${ORDER[from]} → ${s.title}`,
+  );
 
   // 3. A hard, long wheel spin (desktop) or a very long swipe (touch) = one chapter.
   from = ORDER.indexOf(s.title);
@@ -191,6 +220,7 @@ async function main() {
 
   // 5. Step through everything; each chapter once, in order. Reading chapters: scroll inside first.
   const visited = [(await state()).title];
+  const restFps = [];
   let innerScrolled = 0;
   let edgeStepOk = true;
   for (let guard = 0; guard < 40 && visited.at(-1) !== ORDER.at(-1); guard++) {
@@ -199,6 +229,10 @@ async function main() {
     await waitIdle();
     await sleep(250); // a real pause between gestures
     const after = await state();
+    if (process.env.QA_REST_FPS !== "0") {
+      const fps = await evaluate(`new Promise((r) => { let n = 0; const t0 = performance.now(); const f = () => { n++; performance.now() - t0 < 1500 ? requestAnimationFrame(f) : r(Math.round(n / ((performance.now() - t0) / 1000))); }; requestAnimationFrame(f); })`);
+      restFps.push(`${after.title}: ${fps}`);
+    }
     if (after.title === before.title) {
       const sel = `document.getElementById(${JSON.stringify(before.title === "The Details" ? "details" : "entourage")})?.querySelector('.chapter__scroll')`;
       const inner = await evaluate(`(() => { const s = ${sel}; return s ? { top: s.scrollTop, max: s.scrollHeight - s.clientHeight } : null; })()`);
@@ -259,6 +293,8 @@ async function main() {
   s = await state();
   check('"Details & RSVP" link goes to The Details', s.title === "The Details", `now on ${s.title}`);
 
+  if (restFps.length) console.log("fps at rest:", restFps.join(" · "));
+  console.log("tier:", await evaluate("document.documentElement.dataset.tier"));
   const glides = await evaluate("__glides");
   console.log("glides (→ chapter: avg fps, worst frame ms):");
   for (const g of glides) console.log(`  → ${g.to}: ${g.fps} fps, worst ${Math.round(g.worst)} ms`);

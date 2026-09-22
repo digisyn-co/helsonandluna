@@ -1,7 +1,8 @@
 "use client";
 
-import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Component, lazy, Suspense, useEffect, type ReactNode } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { gsap } from "@/lib/gsap";
 import { PerformanceMonitor } from "@react-three/drei";
 import { visibleScenes } from "@/animation/sceneManager";
 import { fallbackTier, stepTier, tierStore, useTier, webglOk } from "@/lib/device";
@@ -26,13 +27,32 @@ class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean
   }
 }
 
+/**
+ * Lite tier: the canvas is drawn only while the page is moving or settling (a scene step),
+ * never at rest — so a still chapter costs the GPU nothing and the compositor can idle.
+ */
+function DrawWhileMoving() {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const root = document.documentElement;
+    const tick = () => {
+      if (root.dataset.step !== "idle") invalidate();
+    };
+    gsap.ticker.add(tick);
+    invalidate();
+    return () => gsap.ticker.remove(tick);
+  }, [invalidate]);
+  return null;
+}
+
 function SceneMounts() {
   const visible = visibleScenes.use();
   return <Suspense fallback={null}>{visible.has("promise") && <PromiseRings />}</Suspense>;
 }
 
 export default function Stage() {
-  const { dpr } = useTier();
+  const { dpr, tier } = useTier();
+  const lite = tier === "low";
   const ok = webglOk.use();
   if (!ok) return null;
 
@@ -41,6 +61,7 @@ export default function Stage() {
       <WebGLBoundary>
         <Canvas
           dpr={dpr}
+          frameloop={lite ? "demand" : "always"}
           gl={{ antialias: tierStore.get() !== "low", alpha: true, powerPreference: "high-performance", stencil: false }}
           camera={{ fov: 35, near: 0.1, far: 50, position: [0, 0, 6] }}
           onCreated={({ gl }) => {
@@ -52,6 +73,8 @@ export default function Stage() {
             requestAnimationFrame(() => loadState.set({ ...loadState.get(), stage: true }));
           }}
         >
+          {lite && <DrawWhileMoving />}
+          {/* Adapts the tier to real frame rates (mid-range Android stays lite; see device.ts). */}
           <PerformanceMonitor bounds={() => [45, 58]} flipflops={3} onDecline={() => stepTier(-1)} onIncline={() => stepTier(1)} onFallback={fallbackTier} />
           <Atmosphere />
           <SceneMounts />

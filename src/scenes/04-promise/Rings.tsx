@@ -56,6 +56,24 @@ export default function Rings() {
   const star = useStarTexture();
   const smoothed = useRef(0);
 
+  // Compile the ring shaders in the background while the chapter is still ahead, so the
+  // first frame they're visible (mid-glide) doesn't stall. Visibility is forced on only
+  // for the synchronous collection step inside compileAsync.
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+    const id = idle(() => {
+      const g = group.current;
+      if (!g) return;
+      const { scene, camera } = get();
+      const was = g.visible;
+      g.visible = true;
+      gl.compileAsync(scene, camera).catch(() => {});
+      g.visible = was;
+    });
+    return () => (window.cancelIdleCallback ?? window.clearTimeout)(id as number);
+  }, [gl, get]);
+
   // Leave the shared camera exactly as we found it.
   useEffect(() => {
     const start = get().camera.position.clone();

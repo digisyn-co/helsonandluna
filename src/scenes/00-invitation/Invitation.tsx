@@ -5,6 +5,7 @@ import { gsap, useGSAP } from "@/lib/gsap";
 import { env } from "@/lib/device";
 import { couple, wedding } from "@/content/wedding";
 import { dur, ease, opening } from "@/animation/tokens";
+import { blurred, focused } from "@/animation/fx";
 import { focusIn, revealChars } from "@/animation/text";
 import { useScene } from "@/animation/useScene";
 import { registerSettle } from "@/animation/sceneManager";
@@ -51,7 +52,7 @@ export function Invitation() {
         .from(q("[data-diamond]"), { scale: 0, transformOrigin: "50% 50%", duration: dur.base, ease: ease.reveal }, opening.line)
         // Camera approach: the whole frame drifts toward us as the monogram resolves.
         .fromTo(q("[data-stage-inner]"), { scale: 0.9 }, { scale: 1, duration: opening.cue, ease: ease.camera }, 0)
-        .fromTo(mono, { autoAlpha: 0, filter: "blur(14px)", scale: 0.94 }, { autoAlpha: 1, filter: "blur(0px)", scale: 1, duration: dur.slow * 1.2, ease: ease.reveal, clearProps: "filter" }, opening.monogram)
+        .fromTo(mono, { autoAlpha: 0, ...blurred(14), scale: 0.94 }, { autoAlpha: 1, ...focused(), scale: 1, duration: dur.slow * 1.2, ease: ease.reveal, clearProps: "filter" }, opening.monogram)
         .fromTo(q(".monogram__sweep"), { xPercent: -80, opacity: 0 }, { xPercent: 80, opacity: 1, duration: dur.sweep, ease: ease.light }, opening.sweep)
         .to(q(".monogram__sweep"), { opacity: 0, duration: dur.base }, `>-${dur.base}`)
         .fromTo(q(".monogram__glint"), { autoAlpha: 0, scale: 0.2, rotate: -30 }, { autoAlpha: 1, scale: 1, rotate: 0, duration: dur.glint, ease: ease.light, stagger: 0.25, yoyo: true, repeat: 1 }, opening.sweep + dur.sweep * 0.45)

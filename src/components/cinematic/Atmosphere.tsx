@@ -17,7 +17,8 @@ const FULLSCREEN_VERT = /* glsl */ `
 
 /** Haze + light rays (full-screen) and champagne motes, driven by the chapter mood blend. */
 export function Atmosphere() {
-  const { particles } = useTier();
+  const { particles, tier } = useTier();
+  const lite = tier === "low";
   const size = useThree((s) => s.size);
   const dpr = useThree((s) => s.viewport.dpr);
   const haze = useRef<ShaderMaterial>(null);
@@ -85,7 +86,9 @@ export function Atmosphere() {
       <mesh frustumCulled={false} renderOrder={-10}>
         <planeGeometry args={[2, 2]} />
         <shaderMaterial
+          key={lite ? "lite" : "full"}
           ref={haze}
+          defines={lite ? { LITE: "" } : {}}
           vertexShader={FULLSCREEN_VERT}
           fragmentShader={hazeFrag}
           uniforms={hazeUniforms}

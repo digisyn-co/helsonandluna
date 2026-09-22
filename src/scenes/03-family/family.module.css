@@ -77,3 +77,8 @@
     background: none;
   }
 }
+
+/* Lite tier: depth of field off (blurred photos moving in 3D are costly). */
+:global(html[data-tier="low"]) .layer {
+  filter: none;
+}

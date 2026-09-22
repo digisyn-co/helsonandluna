@@ -6,17 +6,19 @@ export type Tier = "low" | "medium" | "high";
 
 /** Fidelity per tier. Scales detail, never the story. */
 export const TIER_PRESETS = {
-  low: { dpr: [1, 1.25] as [number, number], particles: 180, postfx: false, ringSegments: 96 },
+  low: { dpr: [1, 1] as [number, number], particles: 140, postfx: false, ringSegments: 96 },
   medium: { dpr: [1, 1.75] as [number, number], particles: 420, postfx: true, ringSegments: 160 },
   high: { dpr: [1, 2] as [number, number], particles: 900, postfx: true, ringSegments: 256 },
 } as const;
 
 const ORDER: Tier[] = ["low", "medium", "high"];
 
-type Env = { reducedMotion: boolean; coarse: boolean; lowPower: boolean; webgl: boolean };
+/** `android`: an Android phone/tablet — their GPUs struggle with full-screen shaders, blend
+ *  modes and filters, so they start (and, unless high-end, stay) in the lite "low" tier. */
+type Env = { reducedMotion: boolean; coarse: boolean; lowPower: boolean; webgl: boolean; android: boolean; highEnd: boolean };
 
 function detectEnv(): Env {
-  if (typeof window === "undefined") return { reducedMotion: false, coarse: true, lowPower: false, webgl: true };
+  if (typeof window === "undefined") return { reducedMotion: false, coarse: true, lowPower: false, webgl: true, android: false, highEnd: false };
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
   const params = new URLSearchParams(location.search);
   return {
@@ -24,6 +26,8 @@ function detectEnv(): Env {
     coarse: matchMedia("(pointer: coarse)").matches,
     lowPower: Boolean(nav.connection?.saveData) || (nav.deviceMemory ?? 8) <= 3 || params.has("lowpower"),
     webgl: !params.has("nowebgl") && supportsWebGL(),
+    android: /Android/i.test(navigator.userAgent),
+    highEnd: (nav.deviceMemory ?? 4) >= 8 && (navigator.hardwareConcurrency ?? 4) >= 8,
   };
 }
 
@@ -47,18 +51,24 @@ function initialTier(env: Env): Tier {
   const forced = forcedTier();
   if (forced) return forced;
   if (env.lowPower) return "low";
+  if (env.android) return env.highEnd ? "medium" : "low";
   if (env.coarse) return (navigator.hardwareConcurrency ?? 4) >= 8 ? "medium" : "low";
   return "high";
 }
 
 export const env: Env = detectEnv();
 export const tierStore = createStore<Tier>(initialTier(env));
+/** The lite rendering path (low tier): no animated blurs, no full-screen blend modes or filters,
+ *  WebGL drawn only while something moves. Read when timelines are built. */
+export const lite = () => tierStore.get() === "low";
+
 /** Flips false if WebGL fails at runtime (context loss, shader error) → static fallback. */
 export const webglOk = createStore<boolean>(env.webgl);
 
 export function stepTier(direction: -1 | 1) {
   if (forcedTier()) return;
   if (env.lowPower && direction === 1) return; // never climb out of low-power mode
+  if (env.android && direction === 1 && (tierStore.get() === "medium" || !env.highEnd)) return; // Android: at most medium, mid-range stays lite
   const i = ORDER.indexOf(tierStore.get());
   tierStore.set(ORDER[Math.min(ORDER.length - 1, Math.max(0, i + direction))]);
 }

@@ -88,3 +88,8 @@
   font-size: 1.2rem;
   color: var(--ivory);
 }
+
+:global(html[data-tier="low"]) .main img,
+:global(html[data-tier="low"]) .second img {
+  filter: none;
+}

@@ -5,6 +5,7 @@ import { TransitionClip, type ClipHandle } from "@/components/cinematic/Transiti
 import { couple, wedding } from "@/content/wedding";
 import { photos } from "@/content/images";
 import { ease } from "@/animation/tokens";
+import { blurred, focused } from "@/animation/fx";
 import { focusIn, revealChars, revealLines } from "@/animation/text";
 import { useChapterTimeline } from "@/animation/useChapterTimeline";
 import { Chapter } from "@/components/cinematic/Chapter";
@@ -28,7 +29,7 @@ export function Closing() {
     scrub: (tl, q) => {
       tl.fromTo(q("[data-ground]"), { yPercent: 0, opacity: 1 }, { yPercent: 55, opacity: 0, duration: 0.55, ease: ease.camera }, 0)
         .fromTo(q("[data-floral]"), { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.3, stagger: 0.08 }, 0.35)
-        .fromTo(q("[data-mono]"), { autoAlpha: 0, scale: 0.9, filter: "blur(10px)" }, { autoAlpha: 1, scale: 1, filter: "blur(0px)", duration: 0.25, ease: ease.reveal }, 0.42)
+        .fromTo(q("[data-mono]"), { autoAlpha: 0, scale: 0.9, ...blurred(10) }, { autoAlpha: 1, scale: 1, ...focused(), duration: 0.25, ease: ease.reveal }, 0.42)
         .fromTo(q(".monogram__sweep"), { xPercent: -80, opacity: 0 }, { xPercent: 80, opacity: 1, duration: 0.25, ease: ease.light }, 0.55)
         .to(q(".monogram__sweep"), { opacity: 0, duration: 0.08 }, 0.72)
         .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 0.9, duration: 0.25 }, 0.22);

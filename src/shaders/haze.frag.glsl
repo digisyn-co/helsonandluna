@@ -1,5 +1,11 @@
 // Full-screen atmospheric haze + light rays, alpha-blended over the CSS sky gradient.
+// LITE (low tier / Android): two noise octaves and no rays — a fraction of the per-pixel cost.
 precision highp float;
+#ifdef LITE
+  #define OCTAVES 2
+#else
+  #define OCTAVES 4
+#endif
 
 uniform float uTime;
 uniform float uHaze;      // 0..1 overall haze amount
@@ -17,7 +23,7 @@ float noise(vec2 p) {
 }
 float fbm(vec2 p) {
   float v = 0.0, a = 0.5;
-  for (int i = 0; i < 4; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
+  for (int i = 0; i < OCTAVES; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
   return v;
 }
 
@@ -30,12 +36,16 @@ void main() {
   float h = fbm(p * 1.6 + vec2(uTime * 0.012, uTime * 0.004));
   h = smoothstep(0.35, 0.95, h) * (0.35 + 0.65 * (1.0 - uv.y));
 
+#ifdef LITE
+  float rays = 0.0;
+#else
   // Soft god-rays from above the frame, very low frequency.
   vec2 src = vec2(0.5 * aspect, 1.25);
   vec2 d = p - src;
   float ang = atan(d.x, -d.y);
   float rays = pow(max(0.0, sin(ang * 9.0 + 1.3) * 0.5 + 0.5), 6.0) * smoothstep(1.6, 0.2, length(d));
   rays *= 0.6 + 0.4 * noise(vec2(ang * 3.0, uTime * 0.05));
+#endif
 
   float a = h * uHaze * 0.22 + rays * uRays * 0.16;
   gl_FragColor = vec4(uTint, a);

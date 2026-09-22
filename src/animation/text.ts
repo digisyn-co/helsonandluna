@@ -2,6 +2,7 @@
 
 import { gsap, SplitText } from "@/lib/gsap";
 import { dur, ease, stagger } from "./tokens";
+import { blurred, focused } from "./fx";
 
 /**
  * Type-reveal building blocks. Each one ADDS tweens to a scene's timeline at `at`,
@@ -46,8 +47,8 @@ export function focusIn(tl: gsap.core.Timeline, el: HTMLElement | null, at: At =
   show(el);
   tl.fromTo(
     el,
-    { opacity: 0, filter: `blur(${from.blur}px)`, letterSpacing: `${wide}px` },
-    { opacity: 1, filter: "blur(0px)", letterSpacing: `${rest}px`, duration: dur.slow, ease: ease.reveal, clearProps: "filter,letterSpacing" },
+    { opacity: 0, ...blurred(from.blur), letterSpacing: `${wide}px` },
+    { opacity: 1, ...focused(), letterSpacing: `${rest}px`, duration: dur.slow, ease: ease.reveal, clearProps: "filter,letterSpacing" },
     at,
   );
 }
@@ -56,9 +57,9 @@ export function focusIn(tl: gsap.core.Timeline, el: HTMLElement | null, at: At =
 export function revealChars(tl: gsap.core.Timeline, el: HTMLElement | null, at: At = 0) {
   if (!el) return;
   const split = SplitText.create(el, { type: "chars" });
-  gsap.set(split.chars, { opacity: 0, yPercent: 40, filter: "blur(8px)" });
+  gsap.set(split.chars, { opacity: 0, yPercent: 40, ...blurred(8) });
   show(el);
-  tl.to(split.chars, { opacity: 1, yPercent: 0, filter: "blur(0px)", duration: dur.reveal, ease: ease.reveal, stagger: stagger.chars }, at);
+  tl.to(split.chars, { opacity: 1, yPercent: 0, ...focused(), duration: dur.reveal, ease: ease.reveal, stagger: stagger.chars }, at);
   revertAfter(tl, split);
   return split;
 }

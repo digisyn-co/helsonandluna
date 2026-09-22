@@ -110,3 +110,8 @@
       radial-gradient(120% 90% at 50% 45%, transparent 50%, rgb(var(--shade-rgb) / 0.5));
   }
 }
+
+/* Lite tier: no blended light sweep over the moving film. */
+:global(html[data-tier="low"]) .sweep {
+  display: none;
+}

@@ -448,3 +448,21 @@ html[data-motion="full"] [data-reveal] {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ---------- Lite tier (Android, low power) ----------
+   Full-screen blend modes and filters are re-composited every frame something moves, which
+   mid-range Android GPUs can't sustain. Same composition, cheaper pixels. */
+html[data-tier="low"] .sky::before {
+  mix-blend-mode: normal;
+  opacity: 0.16;
+}
+html[data-tier="low"] .photo img {
+  filter: none;
+}
+html[data-tier="low"] .photo::after {
+  mix-blend-mode: normal;
+  opacity: 0.85;
+}
+html[data-tier="low"] .monogram {
+  filter: none;
+}

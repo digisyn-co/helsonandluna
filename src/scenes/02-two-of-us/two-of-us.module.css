@@ -98,3 +98,12 @@ html:not([data-motion]) .frame {
     filter: blur(8px);
   }
 }
+
+/* Lite tier: no full-screen blurred copy of the photo, no blurred glows. */
+:global(html[data-tier="low"]) .back {
+  display: none;
+}
+:global(html[data-tier="low"]) .frame,
+:global(html[data-tier="low"]) .bokeh {
+  filter: none;
+}
