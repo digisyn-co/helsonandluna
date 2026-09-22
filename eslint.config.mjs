@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "legacy/**",
+    "integrations/rsvp-sheet/**", // Google Apps Script (its own runtime/globals)
     "**/._*",
   ]),
 ]);
