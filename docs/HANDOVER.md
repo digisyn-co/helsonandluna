@@ -47,6 +47,6 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 
 ## Known limitations and next steps
 - Not tested on physical iOS/Android devices (stepping, touch and reduced motion verified in headless Chrome only). On real phones, check: swipe feel, reading inside Entourage/Details, and the RSVP keyboard.
-- Chapel clip is generic AI footage, not St. Clement's. No music by design.
+- The Ceremony runs real drone footage of the church (`public/clips/church.mp4`, rebuilt by `scripts/build-church-clip.sh`). It carries the videographer's "ORIGSTUDIO2026" watermark: confirm usage rights or get a clean export. No music by design.
 - Spline installed but unused (rings built in R3F).
 - Next: custom domain; "RSVP by" date once the couple confirms it.
