@@ -6,10 +6,22 @@ import "@/styles/globals.css";
 const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"], display: "swap" });
 const sans = Jost({ variable: "--font-sans", subsets: ["latin"], weight: ["300", "400", "500"], display: "swap" });
 
+/** Production domain on Vercel (follows a custom domain once added); localhost in dev. */
+const siteHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const siteUrl = siteHost ? `https://${siteHost}` : "http://localhost:3200";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: `${couple.joined} · ${wedding.dateShort}`,
   description: `You are invited to the wedding of ${couple.joined} — ${wedding.dateLong}, ${wedding.city}.`,
   robots: { index: false, follow: false }, // private invitation
+  // Link previews (Messenger, WhatsApp, iMessage). Image: src/app/opengraph-image.jpg, rebuilt with `pnpm og`.
+  openGraph: {
+    type: "website",
+    title: couple.joined,
+    description: `${wedding.dateLong} · ${wedding.city}. You are invited.`,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

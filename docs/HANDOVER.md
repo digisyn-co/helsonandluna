@@ -9,7 +9,7 @@ Live at https://helsonandluna.vercel.app. Scroll-driven 3D invitation, mobile-fi
 ## Before sending to guests
 - [ ] Couple proofreads every name and fact (`docs/content.md`, entourage in `src/content/entourage.ts`).
 - [ ] Open the link on 2–3 real phones (incl. one older Android) and scroll end to end.
-- [ ] Turn on the OS "Reduce motion" setting and scroll once (not re-tested since the dissolve rework).
+- [ ] Turn on the OS "Reduce motion" setting on a real phone and scroll once (re-checked with `?reduced` in headless Chrome on 2026-09-22 and fixed; see below).
 - [ ] Submit one RSVP, confirm the row appears, then delete it and the earlier test row.
 - [ ] Delete the unused Apps Script project under the other Google account.
 
@@ -30,6 +30,8 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 - `animation/sceneManager.ts` is the only scroll reader. Pinned chapters are fixed `.chapter__pin` layers cross-faded by `layerOpacity()` (`animation/pin.ts`); flow chapters scroll normally and their neighbours fade over 0.35 screens (`fadeScreens`).
 - Theme sampled from the invitation artwork (periwinkle tokens in `styles/tokens.css`, per-chapter `animation/moods.ts`, artwork cloud texture, `CardFrame` gold hairline).
 - Loader waits only for fonts + monogram (4 s fail-safe), never WebGL. three.js is code-split; initial JS ≈ 222 KB gz.
+- Reduced motion: each chapter is one still composition (scrub frozen at 0.5, frozen blurs cleared, rings held at one lit pose), and chapters hand over in sequence instead of cross-dissolving so two chapters' text never overlaps.
+- Link preview: `src/app/opengraph-image.jpg` (1200×630, monogram + names, date, city), rebuilt by `pnpm og`. Absolute URL comes from Vercel's production domain (`metadataBase` in `layout.tsx`).
 - Flow clips (`public/clips`, ~2 MB total) are optional; skipped for reduced motion, low power and the low tier. `?tier=low|mid|high` and `?reduced` force modes for QA.
 - QA: `node scripts/qa-screenshots.mjs` (`QA_VIEWPORTS`, `QA_FRAMES`, `QA_SWEEP=0.5`).
 
@@ -38,11 +40,12 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 |---|---|
 | Change a fact or name | Edit `src/content/*.ts` and `docs/content.md`, push to `main` |
 | Swap a photo | Source on the KINGSTON drive → `pnpm images` |
+| Change the link preview | Edit the text lines in `scripts/build-og.sh` → `pnpm og` |
 | Update Apps Script | Paste `Code.js`, save, Manage deployments → edit → New version (same URL) |
 | Roll back the site | Vercel → Deployments → previous → Promote |
 
 ## Known limitations and next steps
-- Not tested on physical iOS/Android devices; reduced-motion not re-tested after the dissolve change.
+- Not tested on physical iOS/Android devices (reduced motion verified in headless Chrome only).
 - Chapel clip is generic AI footage, not St. Clement's. No music by design.
 - Spline installed but unused (rings built in R3F).
-- Next: custom domain, Open Graph share image, "RSVP by" date once the couple sets one.
+- Next: custom domain; "RSVP by" date once the couple confirms it.

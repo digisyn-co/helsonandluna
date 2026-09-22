@@ -81,7 +81,8 @@ export default function Rings() {
     const delta = Math.min(dt, 1 / 30);
     const target = pinProgress(sceneFrames.promise.progress, LENGTH);
     smoothed.current = MathUtils.damp(smoothed.current, target, 4, delta);
-    const t = smoothed.current;
+    // Reduced motion: one still, fully lit pose (after the light sweep, before the hand-off).
+    const t = env.reducedMotion ? 0.75 : smoothed.current;
 
     const emerge = segment(t, 0.06, 0.34);
     const orbit = segment(t, 0.2, 0.95);

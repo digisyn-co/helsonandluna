@@ -44,6 +44,8 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
       if (env.reducedMotion) {
         showAll(root.current);
         scrub.current?.progress(0.5); // a calm, composed middle frame
+        // A focus-pull frozen halfway would leave that element blurred for good.
+        root.current?.querySelectorAll<HTMLElement>("[style*='blur']").forEach((el) => (el.style.filter = "none"));
         return;
       }
       if (build.reveal) {
@@ -73,7 +75,11 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
       layer.current ??= root.current?.querySelector<HTMLElement>(":scope > .chapter__pin") ?? null;
       const el = layer.current;
       if (el) {
-        const o = Math.round(layerOpacity(p, length, fades.in, fades.out) * 1000) / 1000;
+        let o = layerOpacity(p, length, fades.in, fades.out);
+        // Reduced motion freezes each chapter's composition, so a cross-dissolve would stack two
+        // chapters' text. Hand over instead: the outgoing layer clears before the next appears.
+        if (env.reducedMotion) o = Math.max(0, o * 2 - 1);
+        o = Math.round(o * 1000) / 1000;
         if (o !== shown.current) {
           shown.current = o;
           el.style.opacity = String(o);
