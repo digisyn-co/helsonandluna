@@ -46,7 +46,11 @@ function useStarTexture() {
  * (Type and the exit flare are DOM, in Promise.tsx.)
  */
 export default function Rings() {
-  const { ringSegments } = useTier();
+  const { ringSegments, tier } = useTier();
+  // Lite tier (Android): standard metal instead of physical clear-coat (≈ half the per-pixel
+  // cost, near-identical at phone size) and a lighter tube.
+  const lite = tier === "low";
+  const tube = lite ? 20 : 48;
   const get = useThree((s) => s.get);
   const group = useRef<Group>(null);
   const key = useRef<SpotLight>(null);
@@ -65,10 +69,14 @@ export default function Rings() {
     const id = idle(() => {
       const g = group.current;
       if (!g) return;
-      const { scene, camera } = get();
+      const { scene, camera, invalidate } = get();
       const was = g.visible;
       g.visible = true;
-      gl.compileAsync(scene, camera).catch(() => {});
+      // Then draw one frame at rest: builds the reflection environment (Environment frames=1)
+      // now, not on the first frame of the glide in (lite tier draws only while moving).
+      gl.compileAsync(scene, camera)
+        .then(() => invalidate())
+        .catch(() => {});
       g.visible = was;
     });
     return () => (window.cancelIdleCallback ?? window.clearTimeout)(id as number);
@@ -93,6 +101,7 @@ export default function Rings() {
     clearcoatRoughness: 0.25,
     envMapIntensity: 1.25,
   } as const;
+  const goldStd = { color: gold.color, metalness: gold.metalness, roughness: gold.roughness, envMapIntensity: gold.envMapIntensity } as const;
 
   useFrame((state, dt) => {
     const { camera, scene } = state;
@@ -167,17 +176,21 @@ export default function Rings() {
       <group ref={group}>
         {/* Interlocked bands: slightly flattened tori read as wedding bands, not donuts. */}
         <mesh rotation={[0, 0, 0]} position={[-0.38, 0, 0]} scale={[1, 1, 1.9]}>
-          <torusGeometry args={[RING_R, 0.075, 48, ringSegments]} />
-          <meshPhysicalMaterial {...gold} />
+          <torusGeometry args={[RING_R, 0.075, tube, ringSegments]} />
+          {lite ? <meshStandardMaterial {...goldStd} /> : <meshPhysicalMaterial {...gold} />}
         </mesh>
         <mesh rotation={[Math.PI / 2.3, 0.35, 0]} position={[0.38, 0.05, 0]} scale={[0.92, 0.92, 1.7]}>
-          <torusGeometry args={[RING_R, 0.07, 48, ringSegments]} />
-          <meshPhysicalMaterial {...gold} color="#efd6a6" roughness={0.18} />
+          <torusGeometry args={[RING_R, 0.07, tube, ringSegments]} />
+          {lite ? <meshStandardMaterial {...goldStd} color="#efd6a6" roughness={0.18} /> : <meshPhysicalMaterial {...gold} color="#efd6a6" roughness={0.18} />}
         </mesh>
         {/* A single stone on the first band catches the crystal glint. */}
         <mesh position={[-0.38, RING_R + 0.09, 0]}>
           <octahedronGeometry args={[0.065, 0]} />
-          <meshPhysicalMaterial color="#ffffff" metalness={0} roughness={0} ior={2.4} envMapIntensity={4} clearcoat={1} />
+          {lite ? (
+            <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.05} envMapIntensity={4} />
+          ) : (
+            <meshPhysicalMaterial color="#ffffff" metalness={0} roughness={0} ior={2.4} envMapIntensity={4} clearcoat={1} />
+          )}
         </mesh>
         <sprite ref={glint} position={[-0.38, RING_R + 0.1, 0.12]}>
           <spriteMaterial map={star} transparent opacity={0} depthWrite={false} blending={AdditiveBlending} />

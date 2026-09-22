@@ -8,8 +8,8 @@ import { gsap } from "@/lib/gsap";
 
 /**
  * A short, muted, AI-generated transition clip (Google Flow · Veo 3.1). Clips are an
- * enhancement, never a dependency: they are skipped for reduced motion, low-power /
- * data-saver and the low tier, where the code-built transition plays instead.
+ * enhancement, never a dependency: they are skipped for reduced motion and low-power /
+ * data-saver, where the code-built transition plays instead.
  * The parent scene decides WHEN it plays (`play()`) and fades it via its own timeline.
  */
 export type ClipHandle = { play: () => void };
@@ -25,7 +25,9 @@ function shownOpacity(el: HTMLElement) {
   return o;
 }
 
-const enabled = () => !env.reducedMotion && !env.lowPower && tierStore.get() !== "low";
+// Hardware video decode is cheap even on the lite tier; skipped only for reduced motion and low
+// power / data saver. (tierStore stays subscribed so a runtime change re-renders.)
+const enabled = () => !env.reducedMotion && !env.lowPower && Boolean(tierStore.get());
 
 export const TransitionClip = forwardRef<ClipHandle, { name: string; className?: string }>(function TransitionClip({ name, className }, ref) {
   const video = useRef<HTMLVideoElement>(null);
@@ -41,6 +43,21 @@ export const TransitionClip = forwardRef<ClipHandle, { name: string; className?:
       if (v.preload !== "auto" && (visibleScenes.get() as ReadonlySet<string>).has(scene)) {
         v.preload = "auto";
         v.load();
+        // Warm the decoder (play one frame, rewind) so the real start mid-glide doesn't stall.
+        v.addEventListener(
+          "canplay",
+          () => {
+            if (played.current) return;
+            v.play()
+              .then(() => {
+                if (played.current) return;
+                v.pause();
+                v.currentTime = 0;
+              })
+              .catch(() => {});
+          },
+          { once: true },
+        );
       }
     };
     check();

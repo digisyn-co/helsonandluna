@@ -81,6 +81,9 @@ export function Atmosphere() {
     }
   });
 
+  // Lite tier (Android): the CSS sky and its cloud texture carry the atmosphere alone; the
+  // full-screen haze shader is the single most expensive thing a phone GPU does here.
+  if (lite) return null;
   return (
     <>
       <mesh frustumCulled={false} renderOrder={-10}>

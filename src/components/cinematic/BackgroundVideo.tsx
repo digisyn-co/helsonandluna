@@ -10,9 +10,9 @@ import type { SceneId } from "@/content/scenes";
  * A muted, looping background film for one chapter (e.g. the real drone footage of the
  * church). Unlike TransitionClip it never holds a scene step: it buffers and plays while its
  * chapter is within reach (sceneManager's preload window) and pauses otherwise.
- * Reduced motion, low power / data saver and the low tier get its poster as a still.
+ * Reduced motion and low power / data saver get its poster as a still.
  */
-const enabled = () => !env.reducedMotion && !env.lowPower && tierStore.get() !== "low";
+const enabled = () => !env.reducedMotion && !env.lowPower && Boolean(tierStore.get());
 
 export function BackgroundVideo({ name, scene, className }: { name: string; scene: SceneId; className?: string }) {
   const video = useRef<HTMLVideoElement>(null);

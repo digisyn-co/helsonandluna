@@ -4,7 +4,7 @@ import { Component, lazy, Suspense, useEffect, type ReactNode } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { gsap } from "@/lib/gsap";
 import { PerformanceMonitor } from "@react-three/drei";
-import { visibleScenes } from "@/animation/sceneManager";
+import { sceneFrames, visibleScenes } from "@/animation/sceneManager";
 import { fallbackTier, stepTier, tierStore, useTier, webglOk } from "@/lib/device";
 import { loadState } from "@/lib/loading";
 import { Atmosphere } from "./Atmosphere";
@@ -28,15 +28,19 @@ class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean
 }
 
 /**
- * Lite tier: the canvas is drawn only while the page is moving or settling (a scene step),
- * never at rest — so a still chapter costs the GPU nothing and the compositor can idle.
+ * Lite tier: the only WebGL is The Promise's rings (no haze), so the canvas is shown and drawn
+ * only near that chapter, only while a step is moving or settling, at 30 fps.
  */
 function DrawWhileMoving() {
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     const root = document.documentElement;
+    // 30 fps while moving: the page itself stays at 60, the GPU gets twice the time per frame.
+    let odd = false;
     const tick = () => {
-      if (root.dataset.step !== "idle") invalidate();
+      if (root.dataset.step === "idle" || !sceneFrames.promise.visible) return;
+      odd = !odd;
+      if (odd) invalidate();
     };
     gsap.ticker.add(tick);
     invalidate();
@@ -53,11 +57,12 @@ function SceneMounts() {
 export default function Stage() {
   const { dpr, tier } = useTier();
   const lite = tier === "low";
+  const nearRings = visibleScenes.use().has("promise");
   const ok = webglOk.use();
   if (!ok) return null;
 
   return (
-    <div className="stage" aria-hidden="true">
+    <div className="stage" aria-hidden="true" style={lite && !nearRings ? { visibility: "hidden" } : undefined}>
       <WebGLBoundary>
         <Canvas
           dpr={dpr}

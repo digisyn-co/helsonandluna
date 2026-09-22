@@ -19,12 +19,14 @@
   line-height: 0.95;
 }
 
-/* The reflection that carries into the next chapter. */
+/* The reflection that carries into the next chapter. Drawn small (60vmax) and scaled up
+   ×4.33 by its timeline: a soft gradient looks identical, but the GPU rasterises ~1/19 of the
+   pixels (a 260vmax layer is ~39 Mpx on a 2.6× Android phone). */
 .flare {
   position: absolute;
-  left: calc(50% - 130vmax);
-  top: calc(38% - 130vmax);
-  width: 260vmax;
+  left: calc(50% - 30vmax);
+  top: calc(38% - 30vmax);
+  width: 60vmax;
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(closest-side, rgb(255 246 228 / 0.95), rgb(239 220 183 / 0.55) 30%, rgb(169 180 216 / 0.2) 60%, transparent 75%);

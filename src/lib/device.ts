@@ -14,11 +14,12 @@ export const TIER_PRESETS = {
 const ORDER: Tier[] = ["low", "medium", "high"];
 
 /** `android`: an Android phone/tablet — their GPUs struggle with full-screen shaders, blend
- *  modes and filters, so they start (and, unless high-end, stay) in the lite "low" tier. */
-type Env = { reducedMotion: boolean; coarse: boolean; lowPower: boolean; webgl: boolean; android: boolean; highEnd: boolean };
+ *  modes and filters, so they always use the lite "low" tier. (Chrome caps deviceMemory at 8,
+ *  so a mid-range 8 GB phone can't be told apart from a flagship: no "high-end" exception.) */
+type Env = { reducedMotion: boolean; coarse: boolean; lowPower: boolean; webgl: boolean; android: boolean };
 
 function detectEnv(): Env {
-  if (typeof window === "undefined") return { reducedMotion: false, coarse: true, lowPower: false, webgl: true, android: false, highEnd: false };
+  if (typeof window === "undefined") return { reducedMotion: false, coarse: true, lowPower: false, webgl: true, android: false };
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
   const params = new URLSearchParams(location.search);
   return {
@@ -27,7 +28,6 @@ function detectEnv(): Env {
     lowPower: Boolean(nav.connection?.saveData) || (nav.deviceMemory ?? 8) <= 3 || params.has("lowpower"),
     webgl: !params.has("nowebgl") && supportsWebGL(),
     android: /Android/i.test(navigator.userAgent),
-    highEnd: (nav.deviceMemory ?? 4) >= 8 && (navigator.hardwareConcurrency ?? 4) >= 8,
   };
 }
 
@@ -51,7 +51,7 @@ function initialTier(env: Env): Tier {
   const forced = forcedTier();
   if (forced) return forced;
   if (env.lowPower) return "low";
-  if (env.android) return env.highEnd ? "medium" : "low";
+  if (env.android) return "low";
   if (env.coarse) return (navigator.hardwareConcurrency ?? 4) >= 8 ? "medium" : "low";
   return "high";
 }
@@ -68,7 +68,7 @@ export const webglOk = createStore<boolean>(env.webgl);
 export function stepTier(direction: -1 | 1) {
   if (forcedTier()) return;
   if (env.lowPower && direction === 1) return; // never climb out of low-power mode
-  if (env.android && direction === 1 && (tierStore.get() === "medium" || !env.highEnd)) return; // Android: at most medium, mid-range stays lite
+  if (env.android && direction === 1) return; // Android stays lite
   const i = ORDER.indexOf(tierStore.get());
   tierStore.set(ORDER[Math.min(ORDER.length - 1, Math.max(0, i + direction))]);
 }
