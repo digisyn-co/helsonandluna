@@ -1,7 +1,8 @@
 "use client";
 
-import { forwardRef, useImperativeHandle, useRef, useSyncExternalStore } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useSyncExternalStore } from "react";
 import { env, tierStore } from "@/lib/device";
+import { registerSettle, visibleScenes } from "@/animation/sceneManager";
 
 /**
  * A short, muted, AI-generated transition clip (Google Flow · Veo 3.1). Clips are an
@@ -11,12 +12,51 @@ import { env, tierStore } from "@/lib/device";
  */
 export type ClipHandle = { play: () => void };
 
+/** Rendered opacity (product up the tree), so an off-screen or faded-out clip never holds a step. */
+function shownOpacity(el: HTMLElement) {
+  let o = 1;
+  for (let n: HTMLElement | null = el; n && o > 0.05; n = n.parentElement) {
+    const cs = getComputedStyle(n);
+    if (cs.visibility === "hidden" || cs.display === "none") return 0;
+    o *= Number(cs.opacity);
+  }
+  return o;
+}
+
 const enabled = () => !env.reducedMotion && !env.lowPower && tierStore.get() !== "low";
 
 export const TransitionClip = forwardRef<ClipHandle, { name: string; className?: string }>(function TransitionClip({ name, className }, ref) {
   const video = useRef<HTMLVideoElement>(null);
   const played = useRef(false);
   const on = useSyncExternalStore(tierStore.subscribe, enabled, () => false);
+
+  // Buffer the clip once its chapter is within reach, so it starts on time mid-glide.
+  useEffect(() => {
+    const v = video.current;
+    const scene = v?.closest("section")?.id;
+    if (!v || !scene) return;
+    const check = () => {
+      if (v.preload !== "auto" && (visibleScenes.get() as ReadonlySet<string>).has(scene)) {
+        v.preload = "auto";
+        v.load();
+      }
+    };
+    check();
+    const off = visibleScenes.subscribe(check);
+    return () => void off();
+  }, [on]);
+
+  // While it plays in view, the scene stepper waits for it (up to its hold cap).
+  useEffect(
+    () =>
+      registerSettle({
+        busy: () => {
+          const v = video.current;
+          return Boolean(v && !v.paused && !v.ended && shownOpacity(v) > 0.05);
+        },
+      }),
+    [],
+  );
 
   useImperativeHandle(ref, () => ({
     play() {

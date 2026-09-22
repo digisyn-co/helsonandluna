@@ -20,12 +20,13 @@ export function ThePromise() {
 
   useChapterTimeline("promise", root, {
     // Flow clip: a highlight travels the bands and blooms into golden bokeh → Entourage.
-    onProgress: (t) => t > 0.68 && clip.current?.play(),
+    // Starts just after the chapter's rest frame (0.75, content/scenes.ts), so it plays on the way out.
+    onProgress: (t) => t > 0.77 && clip.current?.play(),
     scrub: (tl, q) => {
       tl.fromTo(q("[data-flare]"), { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "power2.in" }, 0.8)
         .to(q("[data-flare]"), { opacity: 0, duration: 0.04 }, 0.96)
         .fromTo(q("[data-copy]"), { opacity: 1 }, { opacity: 0, duration: 0.08 }, 0.8)
-        .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.72);
+        .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 1, duration: 0.05 }, 0.77);
     },
     revealAt: 0.5,
     reveal: (tl, q) => {

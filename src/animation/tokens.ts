@@ -43,12 +43,22 @@ export const opening = {
   cue: 5.0,
 } as const;
 
-/** Scroll snapping. */
-export const snap = {
-  /** Desktop (Lenis) snap settle duration. */
-  duration: 1.1,
-  /** Only snap when this close to a chapter start (fraction of viewport height). */
-  threshold: 0.35,
-  /** Wait for the scroll to settle before snapping (ms). */
-  debounce: 140,
+/** Scene stepping: one scroll = one chapter (animation/sceneStepper.ts). */
+export const step = {
+  /** Glide duration (s) = base + perScreen × screens travelled, clamped to min..max. */
+  base: 0.9,
+  perScreen: 0.55,
+  min: 1.4,
+  max: 3,
+  ease: "power2.inOut",
+  /** Reduced motion: a short, plain hand-over. */
+  reduced: 0.6,
+  /** After arriving, input stays locked at least this long… */
+  minHold: 0.25,
+  /** …and at most this long while text reveals or a visible clip finish. */
+  maxHold: 4.5,
+  /** A wheel event starts a new gesture after this gap (ms) — trackpad momentum never re-triggers. */
+  wheelGap: 200,
+  /** Swipe distance (px) that counts as one scroll. */
+  swipe: 40,
 } as const;

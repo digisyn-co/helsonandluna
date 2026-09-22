@@ -18,12 +18,16 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-/* Touch devices: native momentum scrolling with soft, proximity-only snapping. */
-html.native-snap {
-  scroll-snap-type: y proximity;
+/* A presentation, not a scrolling page: the scene stepper moves between chapters, so the
+   page never pans under a finger (pinch-zoom stays), never pull-to-refreshes and shows no
+   scrollbar. Reading chapters scroll inside `.chapter__scroll`. */
+html {
+  touch-action: pinch-zoom;
+  overscroll-behavior: none;
+  scrollbar-width: none;
 }
-[data-snap] {
-  scroll-snap-align: start;
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -164,9 +168,22 @@ html:not([data-motion]) .chapter__pin {
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none; /* enabled on the visible layer by useChapterTimeline */
   display: grid;
   place-items: center;
   padding: calc(var(--safe-top) + 3rem) var(--gutter) calc(var(--safe-bottom) + 2rem);
+}
+
+/* Reading chapters: exactly one screen, scrolling inside (never chaining to the page). */
+.chapter__scroll {
+  position: relative;
+  height: var(--scene-h);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(212 180 131 / 0.45) transparent;
 }
 
 .chapter__flow {

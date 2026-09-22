@@ -25,15 +25,16 @@ Live at https://helsonandluna.vercel.app. Scroll-driven 3D invitation, mobile-fi
 Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/exec` with `secret` in the JSON body (Apps Script can't read headers) → `LockService` + formula-injection guard → append to the "RSVPs" tab. No webhook configured → honest 503; Apps Script `{ok:false}` → 502. To rotate the secret, change both sides, then redeploy Vercel.
 
 ## How it's built
-- Next.js 16 (App Router) · React 19.2 (R3F 9.7 needs <19.3) · three 0.186 · drei · GSAP 3.15 · Lenis · pnpm · Node 22.
+- Next.js 16 (App Router) · React 19.2 (R3F 9.7 needs <19.3) · three 0.186 · drei · GSAP 3.15 · pnpm · Node 22.
 - Story: invitation → beginning → two-of-us → family → promise → entourage (flow) → ceremony → celebration → details (flow, RSVP) → closing. Lengths in `src/content/scenes.ts`.
+- One scroll = one chapter: `animation/sceneStepper.ts` glides rest frame → rest frame (`rest` in `content/scenes.ts`) and locks input until the chapter has settled (text reveals, visible clips, the opening; max 4.5 s). Trackpad momentum, hard wheel spins and swipes started while locked count once or not at all. Entourage and Details are one screen with their own inner scroll; a gesture at their edge moves on. Keyboard: arrows / Page / Space / Home / End. Tunables in `animation/tokens.ts` → `step`.
 - `animation/sceneManager.ts` is the only scroll reader. Pinned chapters are fixed `.chapter__pin` layers cross-faded by `layerOpacity()` (`animation/pin.ts`); flow chapters scroll normally and their neighbours fade over 0.35 screens (`fadeScreens`).
 - Theme sampled from the invitation artwork (periwinkle tokens in `styles/tokens.css`, per-chapter `animation/moods.ts`, artwork cloud texture, `CardFrame` gold hairline).
 - Loader waits only for fonts + monogram (4 s fail-safe), never WebGL. three.js is code-split; initial JS ≈ 222 KB gz.
 - Reduced motion: each chapter is one still composition (scrub frozen at 0.5, frozen blurs cleared, rings held at one lit pose), and chapters hand over in sequence instead of cross-dissolving so two chapters' text never overlaps.
 - Link preview: `src/app/opengraph-image.jpg` (1200×630, monogram + names, date, city), rebuilt by `pnpm og`. Absolute URL comes from Vercel's production domain (`metadataBase` in `layout.tsx`).
 - Flow clips (`public/clips`, ~2 MB total) are optional; skipped for reduced motion, low power and the low tier. `?tier=low|mid|high` and `?reduced` force modes for QA.
-- QA: `node scripts/qa-screenshots.mjs` (`QA_VIEWPORTS`, `QA_FRAMES`, `QA_SWEEP=0.5`).
+- QA: `node scripts/qa-screenshots.mjs` (`QA_VIEWPORTS`, `QA_FRAMES`, `QA_SWEEP=0.5`; uses `?free`), `node scripts/qa-stepping.mjs` (wheel/touch/keyboard stepping checks + glide fps; `QA_TOUCH=1`, `QA_FILM=promise`).
 
 ## Common tasks
 | Task | How |
@@ -45,7 +46,7 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 | Roll back the site | Vercel → Deployments → previous → Promote |
 
 ## Known limitations and next steps
-- Not tested on physical iOS/Android devices (reduced motion verified in headless Chrome only).
+- Not tested on physical iOS/Android devices (stepping, touch and reduced motion verified in headless Chrome only). On real phones, check: swipe feel, reading inside Entourage/Details, and the RSVP keyboard.
 - Chapel clip is generic AI footage, not St. Clement's. No music by design.
 - Spline installed but unused (rings built in R3F).
 - Next: custom domain; "RSVP by" date once the couple confirms it.

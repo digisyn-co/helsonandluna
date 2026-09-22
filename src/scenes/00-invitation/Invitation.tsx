@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { env } from "@/lib/device";
 import { couple, wedding } from "@/content/wedding";
 import { dur, ease, opening } from "@/animation/tokens";
 import { focusIn, revealChars } from "@/animation/text";
 import { useScene } from "@/animation/useScene";
+import { registerSettle } from "@/animation/sceneManager";
 import { curtainUp } from "@/components/ui/LoadingScreen";
 import { Monogram } from "@/components/cinematic/Monogram";
 import { Ornament } from "@/components/cinematic/Ornament";
@@ -16,7 +17,8 @@ import s from "./invitation.module.css";
 /**
  * 00 — The Invitation. Plays on load (after the curtain), a few seconds long:
  * darkness → glimmer → ornament draws → approach → monogram → light sweep + crystal glints
- * → florals → names → date → scroll cue. Scrolling during it fast-forwards to the end.
+ * → florals → names → date → scroll cue. Scrolling during it fast-forwards to the end
+ * (the scene stepper holds the first step until it has finished).
  * Scrolling away scrubs the exit: the monogram rises toward camera and dissolves into haze.
  */
 export function Invitation() {
@@ -72,17 +74,24 @@ export function Invitation() {
     { scope: root },
   );
 
+  // The first step waits for the curtain and the opening; scrolling during it fast-forwards.
+  useEffect(
+    () =>
+      registerSettle({
+        busy: () => !env.reducedMotion && (!curtainUp.get() || Boolean(intro.current?.isActive())),
+        nudge: () => void (intro.current?.isActive() && intro.current.timeScale(5)),
+      }),
+    [],
+  );
+
   useScene("invitation", root, {
     progress: (p) => {
-      // Skip ahead: any real scroll while the intro plays finishes it quickly.
-      const tl = intro.current;
-      if (tl && tl.isActive() && p > 0.52) tl.timeScale(5);
       exit.current?.progress(Math.max(0, (p - 0.5) * 2));
     },
   });
 
   return (
-    <section ref={root} id="invitation" className={`chapter ${s.scene}`} data-snap aria-label="The invitation">
+    <section ref={root} id="invitation" className={`chapter ${s.scene}`} aria-label="The invitation">
       <div className={s.inner} data-stage-inner>
         <span className={s.glimmer} data-glimmer aria-hidden="true" />
         <Ornament className={s.ornament} />

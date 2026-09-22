@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { env } from "@/lib/device";
 import { fadeScreens, sceneLength, type SceneId } from "@/content/scenes";
 import { layerOpacity, pinProgress } from "./pin";
 import { showAll } from "./text";
 import { useScene } from "./useScene";
+import { registerSettle, sceneFrames } from "./sceneManager";
 
 type Build = {
   /**
@@ -66,6 +67,9 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
     { scope: root },
   );
 
+  // The stepper holds on this chapter until its type has finished revealing.
+  useEffect(() => registerSettle({ busy: () => sceneFrames[id].active && Boolean(reveal.current?.isActive()) }), [id]);
+
   const layer = useRef<HTMLElement | null>(null);
   const shown = useRef(-1);
 
@@ -84,6 +88,9 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
           shown.current = o;
           el.style.opacity = String(o);
           el.style.visibility = o > 0 ? "visible" : "hidden";
+          // Revealed children carry their own `visibility: visible`, so a hidden layer's text
+          // would still catch taps over other chapters. Only the dominant layer takes input.
+          el.style.pointerEvents = o >= 0.5 ? "auto" : "none";
         }
       }
       const t = pinProgress(p, length);

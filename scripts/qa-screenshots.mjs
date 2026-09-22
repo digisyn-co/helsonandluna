@@ -16,7 +16,9 @@ import { mkdirSync, writeFileSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const URL_ = process.argv[2] ?? "http://localhost:3200/";
+// `free` turns the scene stepper off, so frames can be taken at any scroll position.
+const withFree = (u) => { const x = new URL(u); x.searchParams.set("free", ""); return x.toString(); };
+const URL_ = withFree(process.argv[2] ?? "http://localhost:3200/");
 const OUT = process.argv[3] ?? "docs/qa";
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PORT = 9333;
@@ -105,7 +107,7 @@ async function main() {
         const target = Math.min(y, max);
         await send("Runtime.evaluate", {
           awaitPromise: true,
-          expression: `(async () => { window.__lenis ? __lenis.scrollTo(${target}, { immediate: true }) : scrollTo(0, ${target}); await new Promise((r) => setTimeout(r, 1400)); })()`,
+          expression: `(async () => { scrollTo(0, ${target}); await new Promise((r) => setTimeout(r, 1400)); })()`,
         });
         const { result: info } = await send("Runtime.evaluate", { expression: "document.querySelector('.progress__title')?.textContent", returnByValue: true });
         const { data } = await send("Page.captureScreenshot", { format: "jpeg", quality: 60 });
@@ -123,7 +125,7 @@ async function main() {
           const el = document.getElementById(${JSON.stringify(id)});
           const top = el.getBoundingClientRect().top + scrollY;
           const y = top + ${t} * Math.max(0, el.offsetHeight - innerHeight);
-          window.__lenis ? __lenis.scrollTo(y, { immediate: true }) : scrollTo(0, y);
+          scrollTo(0, y);
           await new Promise((r) => setTimeout(r, 3200));
         })()`,
       });

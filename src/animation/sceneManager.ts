@@ -24,7 +24,8 @@ export type SceneHandlers = {
 
 type Entry = { el: HTMLElement; top: number; height: number; handlers: Set<SceneHandlers>; frame: SceneFrame };
 
-const PRELOAD_SCREENS = 1;
+/** One scene step travels up to ~3 screens, so the next chapter mounts before its glide starts. */
+const PRELOAD_SCREENS = 2.5;
 
 const entries = new Map<SceneId, Entry>();
 /** Read-only per-frame state for render loops (WebGL), keyed by scene id. */
@@ -74,7 +75,7 @@ export function registerScene(id: SceneId, el: HTMLElement, handlers: SceneHandl
   };
 }
 
-/** Called once per frame from the shared GSAP ticker (see SmoothScroll). */
+/** Called once per frame from the shared GSAP ticker (see ScrollProvider). */
 export function updateScenes() {
   const y = window.scrollY;
   const vh = window.innerHeight;
@@ -122,11 +123,22 @@ export function updateScenes() {
   if (prev.size !== visible.size || [...visible].some((v) => !prev.has(v))) visibleScenes.set(visible);
 }
 
-/** Scroll to a chapter (used by the progress UI and "Skip to details"). */
-export function scrollToScene(id: SceneId, immediate = false) {
+/** Measured document position of a chapter (for the scene stepper). */
+export function sceneBox(id: SceneId) {
   const e = entries.get(id);
-  if (!e) return;
-  const lenis = (window as Window & { __lenis?: { scrollTo: (y: number, o?: object) => void } }).__lenis;
-  if (lenis && !immediate) lenis.scrollTo(e.top, { duration: 1.6 });
-  else window.scrollTo({ top: e.top, behavior: immediate ? "auto" : "smooth" });
+  return e ? { top: e.top, height: e.height } : null;
 }
+
+/**
+ * "Still settling" registry. The stepper keeps input locked after arriving at a chapter
+ * while any check returns true (a text reveal or a visible clip still playing), up to a cap.
+ * `nudge` is called when someone scrolls while locked (e.g. to fast-forward the opening).
+ */
+type Settle = { busy: () => boolean; nudge?: () => void };
+const settles = new Set<Settle>();
+export function registerSettle(s: Settle) {
+  settles.add(s);
+  return () => void settles.delete(s);
+}
+export const anyBusy = () => [...settles].some((s) => s.busy());
+export const nudgeAll = () => settles.forEach((s) => s.nudge?.());

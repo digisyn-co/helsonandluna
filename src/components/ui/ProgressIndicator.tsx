@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { SCENES } from "@/content/scenes";
-import { activeScene, page, scrollToScene } from "@/animation/sceneManager";
+import { activeScene, page } from "@/animation/sceneManager";
+import { goToScene } from "@/animation/sceneStepper";
 import { gsap } from "@/lib/gsap";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -43,7 +44,7 @@ export function ProgressIndicator() {
         tabIndex={onDetails ? -1 : 0}
         onClick={(e) => {
           e.preventDefault();
-          scrollToScene("details");
+          goToScene("details");
           document.getElementById("details")?.focus({ preventScroll: true });
         }}
       >

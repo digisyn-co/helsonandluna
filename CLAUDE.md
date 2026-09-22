@@ -2,10 +2,10 @@
 
 # Helson & Luna — cinematic wedding invitation
 
-Mobile-first, scroll-driven 3D invitation. Next.js 16 (App Router) · React 19.2 · R3F 9 + drei · GSAP 3.15 (SplitText, DrawSVG) · Lenis 1.3 · pnpm.
+Mobile-first, scroll-driven 3D invitation presented one chapter per scroll. Next.js 16 (App Router) · React 19.2 · R3F 9 + drei · GSAP 3.15 (SplitText, DrawSVG) · pnpm.
 
 ## Commands
-`pnpm dev` (port 3200) · `pnpm build` · `pnpm typecheck` · `pnpm lint` · `pnpm images` (rebuild web images from the photo shoot on the KINGSTON drive) · `node scripts/qa-screenshots.mjs` (QA screenshots at 5 viewports → docs/qa/)
+`pnpm dev` (port 3200) · `pnpm build` · `pnpm typecheck` · `pnpm lint` · `pnpm images` (rebuild web images from the photo shoot on the KINGSTON drive) · `node scripts/qa-screenshots.mjs` (QA screenshots at 5 viewports → docs/qa/; runs with `?free`) · `node scripts/qa-stepping.mjs` (real wheel/touch/keyboard input against the stepper; `QA_TOUCH=1`, `QA_FILM=<chapter>`) · `pnpm og` (link-preview image)
 
 ## Rules (from the brief — these win)
 - **Mobile is the product.** Check 390×844 first, then 375 / 393 / 430 and 1440×900.
@@ -16,9 +16,10 @@ Mobile-first, scroll-driven 3D invitation. Next.js 16 (App Router) · React 19.2
 - Don't claim a Spline scene or MCP exists unless created and verified. The Spline MCP is **not** installed; 3D uses the R3F fallback.
 
 ## Architecture
+- **1 scroll = 1 chapter.** `src/animation/sceneStepper.ts` owns all page movement: a gesture glides from one chapter's `rest` frame (`content/scenes.ts`) to the next's, then holds until the chapter has settled (reveals via `registerSettle` in `useChapterTimeline`, visible clips in `TransitionClip`, the opening in `Invitation`; capped at `step.maxHold`). Momentum and gestures made while locked never count. Never add free page scrolling, Lenis or CSS scroll-snap back. Reading chapters (Entourage, Details) are one screen with an inner `.chapter__scroll`. `?free` turns the stepper off for QA scripts only.
 - `src/animation/sceneManager.ts` — the ONLY scroll reader. Scenes register via `useScene` / `useChapterTimeline` (scrub timeline + one-shot reveal). Timings in `animation/tokens.ts` + `styles/tokens.css`; per-chapter atmosphere in `animation/moods.ts`.
 - `src/scenes/NN-name/` — one folder per chapter; order, lengths (screens) and `flow` flags live in `content/scenes.ts`. Story order: Invitation → Beginning → Two of Us → Family → Promise → Entourage → Ceremony → Celebration → Details → Closing.
-- Pinned chapters are **fixed layers that cross-dissolve** (`layerOpacity` in `animation/pin.ts`, applied by `useChapterTimeline`); sections only provide scroll distance. `flow` chapters (Entourage, Details) scroll normally and their neighbours fade within a third of a screen of them. Every chapter's first frame (t=0) must be non-empty, because it is seen while dissolving in.
+- Pinned chapters are **fixed layers that cross-dissolve** (`layerOpacity` in `animation/pin.ts`, applied by `useChapterTimeline`); sections only provide scroll distance. `flow` chapters (Entourage, Details) scroll normally and their neighbours fade within a third of a screen of them. Every chapter's first frame (t=0) must be non-empty, because it is seen while dissolving in. Hidden layers take no pointer input (revealed children carry their own `visibility: visible`). When changing a chapter's timeline, keep its `rest` frame composed and put exit-only effects (clips, flares) after it.
 - Theme = the artwork's paper: periwinkle moods (`animation/moods.ts`), the artwork's own cloud texture (`public/images/sky-clouds.webp`, luminance-only), gold `CardFrame`. Legibility shading uses `--shade-rgb` (deep periwinkle, never black).
 - The loader waits for fonts + monogram only, never for WebGL.
 - `src/components/cinematic/Stage.tsx` — one shared transparent canvas (haze + particles; per-scene 3D lazy-mounted near its chapter). Sky colour is CSS (`Sky.tsx`), so the no-WebGL fallback keeps the world.

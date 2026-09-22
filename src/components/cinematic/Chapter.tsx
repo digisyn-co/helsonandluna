@@ -13,7 +13,9 @@ type Props = {
 
 /**
  * A full-screen chapter. Chapters longer than one screen keep their content pinned
- * (sticky) while the extra height becomes scroll distance for the camera.
+ * while the extra height becomes scroll distance for the camera.
+ * Reading chapters (`pinned={false}`) are exactly one screen with their own scroller, so
+ * one page step reaches them and every name / RSVP field is still reachable inside.
  */
 export const Chapter = forwardRef<HTMLElement, Props>(function Chapter({ id, label, className, pinClassName, pinned = true, children }, ref) {
   const length = sceneLength(id);
@@ -21,15 +23,18 @@ export const Chapter = forwardRef<HTMLElement, Props>(function Chapter({ id, lab
     <section
       ref={ref}
       id={id}
-      // Snap only to screen-sized pinned chapters; long reading chapters scroll freely
-      // (snapping inside them could skip names or RSVP fields).
-      data-snap={pinned ? "" : undefined}
       aria-label={label}
       tabIndex={-1}
       className={["chapter", className].filter(Boolean).join(" ")}
       style={{ minHeight: `calc(var(--scene-h) * ${length})` }}
     >
-      <div className={[pinned ? "chapter__pin" : "chapter__flow", pinClassName].filter(Boolean).join(" ")}>{children}</div>
+      {pinned ? (
+        <div className={["chapter__pin", pinClassName].filter(Boolean).join(" ")}>{children}</div>
+      ) : (
+        <div className="chapter__scroll">
+          <div className={["chapter__flow", pinClassName].filter(Boolean).join(" ")}>{children}</div>
+        </div>
+      )}
     </section>
   );
 });
