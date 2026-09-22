@@ -153,7 +153,10 @@ export function goToScene(id: SceneId) {
 }
 
 /** One step forward/back — only when the current scene has settled. */
+const modalOpen = () => Boolean(document.querySelector("dialog[open]"));
+
 function request(dir: 1 | -1) {
+  if (modalOpen()) return; // e.g. the thank-you page after an RSVP
   if (phase === "holding") nudgeAll();
   if (phase !== "idle") return;
   const next = current + dir;
@@ -177,6 +180,11 @@ let lastAbs = 0;
 
 function onWheel(e: WheelEvent) {
   if (e.ctrlKey) return; // pinch-zoom on trackpads
+  if (modalOpen()) {
+    // The dialog scrolls itself if it's taller than the screen; the page never moves.
+    if (!(e.target as Element | null)?.closest("dialog")) e.preventDefault();
+    return;
+  }
   const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? vh() : 1;
   const dy = e.deltaY * unit;
   const abs = Math.abs(dy);
@@ -205,7 +213,7 @@ function onTouchStart(e: TouchEvent) {
 
 function onTouchMove(e: TouchEvent) {
   // The page itself never pans (CSS touch-action); reading scrollers pan natively.
-  const inReader = (e.target as Element | null)?.closest(".chapter__scroll");
+  const inReader = (e.target as Element | null)?.closest(".chapter__scroll, dialog");
   if (touch && !inReader && e.touches.length === 1 && e.cancelable) e.preventDefault();
 }
 
@@ -225,7 +233,7 @@ function onTouchEnd(e: TouchEvent) {
 const clearTouch = () => void (touch = null);
 
 function onKey(e: KeyboardEvent) {
-  if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || modalOpen()) return;
   const t = e.target as HTMLElement | null;
   if (t?.closest("input, textarea, select, [contenteditable]")) return;
   if (e.key === " " && t?.closest("button, a, label, summary")) return;

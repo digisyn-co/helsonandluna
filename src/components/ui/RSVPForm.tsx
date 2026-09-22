@@ -2,9 +2,10 @@
 
 import { useId, useState, type FormEvent } from "react";
 import { details } from "@/content/wedding";
+import { ThankYou } from "./ThankYou";
 import s from "./rsvp.module.css";
 
-type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent"; attending: boolean } | { kind: "error"; message: string };
+type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent"; attending: boolean; name: string } | { kind: "error"; message: string };
 
 /**
  * RSVP form: a few large touch targets, works with the keyboard and screen readers,
@@ -13,6 +14,7 @@ type Status = { kind: "idle" } | { kind: "sending" } | { kind: "sent"; attending
 export function RSVPForm() {
   const id = useId();
   const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const [thanks, setThanks] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,7 +29,8 @@ export function RSVPForm() {
       });
       const body = (await res.json().catch(() => ({}))) as { message?: string };
       if (!res.ok) throw new Error(body.message ?? "Something went wrong. Please try again.");
-      setStatus({ kind: "sent", attending: data.attending === "yes" });
+      setStatus({ kind: "sent", attending: data.attending === "yes", name: String(data.name ?? "") });
+      setThanks(true);
       form.reset();
     } catch (err) {
       setStatus({ kind: "error", message: err instanceof Error ? err.message : "Something went wrong. Please try again." });
@@ -36,9 +39,12 @@ export function RSVPForm() {
 
   if (status.kind === "sent") {
     return (
-      <div className={s.done} role="status">
-        <p className="display">{status.attending ? "Thank you — we can't wait to celebrate with you." : "Thank you for letting us know."}</p>
-      </div>
+      <>
+        <div className={s.done} role="status">
+          <p className="display">{status.attending ? "Thank you — we can't wait to celebrate with you." : "Thank you for letting us know."}</p>
+        </div>
+        <ThankYou open={thanks} name={status.name} attending={status.attending} onClose={() => setThanks(false)} />
+      </>
     );
   }
 
