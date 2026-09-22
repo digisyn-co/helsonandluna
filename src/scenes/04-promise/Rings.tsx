@@ -83,7 +83,7 @@ export default function Rings() {
     smoothed.current = MathUtils.damp(smoothed.current, target, 4, delta);
     const t = smoothed.current;
 
-    const emerge = segment(t, 0.16, 0.42);
+    const emerge = segment(t, 0.06, 0.34);
     const orbit = segment(t, 0.2, 0.95);
     const light = segment(t, 0.42, 0.72);
     const crystal = segment(t, 0.6, 0.72);
@@ -96,7 +96,7 @@ export default function Rings() {
     const fit = landscape ? 0.74 : Math.min(1, aspect / 0.8);
     const g = group.current;
     // Only exist inside this chapter's window — never as silhouettes over neighbours.
-    const inWindow = target > 0.01 && target < 0.985;
+    const inWindow = sceneFrames.promise.progress > 0 && target < 0.985;
     if (g) g.visible = inWindow;
     if (g) {
       g.scale.setScalar((0.82 + emerge * 0.18) * fit);
@@ -119,7 +119,7 @@ export default function Rings() {
 
     // First, a tiny reflection in the dark; it grows into the first highlight.
     if (reflection.current) {
-      const r = segment(t, 0.06, 0.2) * (1 - segment(t, 0.28, 0.4));
+      const r = segment(t, 0, 0.12) * (1 - segment(t, 0.24, 0.36));
       reflection.current.material.opacity = r;
       reflection.current.scale.setScalar(0.15 + r * 0.35);
     }

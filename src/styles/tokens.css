@@ -1,19 +1,22 @@
 /* Design tokens — the single place for colour, type, spacing and motion values. */
 :root {
-  /* Palette (translated from the original theme artwork and the monogram) */
-  --midnight-950: #070a16;   /* opening darkness */
-  --midnight-900: #0c1227;
-  --midnight-800: #151d3b;
-  --dusty-700: #3a4775;
-  --dusty-500: #6f7fb3;      /* primary: ethereal dusty blue */
-  --dusty-300: #a9b4d8;
-  --dusty-100: #dde2f1;
+  /* Palette — sampled from the theme artwork's background (dusty periwinkle paper with
+     marbled clouds). "midnight" names are kept for the deepest shades of that field. */
+  --midnight-950: #4c5172;   /* deepest periwinkle (loader, page base) */
+  --midnight-900: #585d7e;
+  --midnight-800: #62678a;
+  --dusty-700: #6c7190;      /* artwork field, shadow side */
+  --dusty-500: #7a7f9c;      /* artwork field, median */
+  --dusty-300: #a9abc2;
+  --dusty-100: #dcdce8;
+  --cloud: #c6b3b8;          /* warm blush in the artwork's clouds */
+  --shade-rgb: 54 58 90;     /* legibility shading, a deep periwinkle (never black) */
   --gold-600: #a8844e;       /* champagne gold, shadow side */
   --gold-400: #d4b483;       /* champagne gold, lit */
   --gold-200: #efdcb7;       /* specular */
-  --ivory: #f6f0e6;          /* type, highlights */
-  --ivory-muted: rgba(246, 240, 230, 0.72);
-  --ivory-faint: rgba(246, 240, 230, 0.5);
+  --ivory: #fffaf2;          /* type — near-white for contrast on periwinkle */
+  --ivory-muted: rgba(255, 250, 242, 0.88);
+  --ivory-faint: rgba(255, 250, 242, 0.66);
   --blush: #e7c2c1;          /* accent, sparingly */
   --lavender: #c7c1e0;       /* very subtle */
 

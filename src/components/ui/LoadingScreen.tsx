@@ -4,22 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
 import { dur, ease } from "@/animation/tokens";
 import { isReady, loadState, readyFraction } from "@/lib/loading";
-import { webglOk } from "@/lib/device";
 import { createStore } from "@/lib/store";
 import { Monogram } from "@/components/cinematic/Monogram";
 
 /** Flips true when the curtain has lifted — scene 00 starts its opening then. */
 export const curtainUp = createStore(false);
 
-const FAILSAFE_MS = 7000;
+const FAILSAFE_MS = 4000;
 
 export function LoadingScreen() {
   const root = useRef<HTMLDivElement>(null);
   const line = useRef<HTMLDivElement>(null);
   const state = loadState.use();
-  const webgl = webglOk.use();
   const [timedOut, setTimedOut] = useState(false);
-  const ready = isReady(state, webgl) || timedOut;
+  const ready = isReady(state) || timedOut;
 
   // Scene-00 prerequisites: fonts and the hero monogram image.
   useEffect(() => {
@@ -32,8 +30,8 @@ export function LoadingScreen() {
   }, []);
 
   useEffect(() => {
-    if (line.current) gsap.to(line.current, { scaleX: ready ? 1 : readyFraction(state, webgl), duration: dur.base, ease: ease.fade });
-  }, [state, webgl, ready]);
+    if (line.current) gsap.to(line.current, { scaleX: ready ? 1 : readyFraction(state), duration: dur.base, ease: ease.fade });
+  }, [state, ready]);
 
   useEffect(() => {
     if (!ready || !root.current) return;

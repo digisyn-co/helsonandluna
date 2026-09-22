@@ -23,7 +23,7 @@ html:not([data-motion]) .aperture {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgb(12 18 39 / 0.25) 0%, transparent 28%, rgb(7 10 22 / 0.6) 55%, rgb(7 10 22 / 0.94) 100%),
+    linear-gradient(180deg, rgb(var(--shade-rgb) / 0.25) 0%, transparent 28%, rgb(var(--shade-rgb) / 0.6) 55%, rgb(var(--shade-rgb) / 0.94) 100%),
     radial-gradient(80% 60% at 50% 30%, rgb(169 180 216 / 0.35), transparent 70%);
   pointer-events: none;
 }

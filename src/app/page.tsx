@@ -1,13 +1,14 @@
 import { ScrollProvider } from "@/animation/ScrollProvider";
 import { Sky } from "@/components/cinematic/Sky";
+import { CardFrame } from "@/components/cinematic/CardFrame";
 import { StageClient } from "@/components/cinematic/StageClient";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ProgressIndicator } from "@/components/ui/ProgressIndicator";
 import { Invitation } from "@/scenes/00-invitation/Invitation";
 import { Beginning } from "@/scenes/01-beginning/Beginning";
 import { TwoOfUs } from "@/scenes/02-two-of-us/TwoOfUs";
-import { ThePromise } from "@/scenes/03-promise/Promise";
-import { Family } from "@/scenes/04-family/Family";
+import { ThePromise } from "@/scenes/04-promise/Promise";
+import { Family } from "@/scenes/03-family/Family";
 import { Entourage } from "@/scenes/05-entourage/Entourage";
 import { Ceremony } from "@/scenes/06-ceremony/Ceremony";
 import { Celebration } from "@/scenes/07-celebration/Celebration";
@@ -24,13 +25,14 @@ export default function Home() {
       <LoadingScreen />
       <Sky />
       <StageClient />
+      <CardFrame />
       <ProgressIndicator />
       <main className="story">
         <Invitation />
         <Beginning />
         <TwoOfUs />
-        <ThePromise />
         <Family />
+        <ThePromise />
         <Entourage />
         <Ceremony />
         <Celebration />

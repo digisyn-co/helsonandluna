@@ -16,7 +16,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#070a16",
+  themeColor: "#4c5172",
 };
 
 /** Runs before first paint so revealable text is hidden only when motion is actually on. */

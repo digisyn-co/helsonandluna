@@ -21,9 +21,9 @@ export function TwoOfUs() {
 
   useChapterTimeline("two-of-us", root, {
     scrub: (tl, q) => {
-      tl.fromTo(q("[data-back]"), { scale: 1.25, opacity: 0 }, { scale: 1.05, opacity: 0.4, duration: 0.6, ease: ease.camera }, 0)
+      tl.fromTo(q("[data-back]"), { scale: 1.25, opacity: 0.25 }, { scale: 1.05, opacity: 0.4, duration: 0.6, ease: ease.camera }, 0)
         // A fragment: a narrow window around their faces (upper third of the beach photo).
-        .fromTo(q("[data-frame]"), { clipPath: "inset(12% 26% 62% 26%)", opacity: 0 }, { opacity: 1, duration: 0.12 }, 0.08)
+        .fromTo(q("[data-frame]"), { clipPath: "inset(8% 14% 52% 14%)", opacity: 1 }, { opacity: 1, duration: 0.01 }, 0)
         .to(q("[data-frame]"), { clipPath: "inset(0% 0% 0% 0%)", duration: 0.45, ease: ease.camera }, 0.25)
         .fromTo(q("[data-frame] img"), { scale: 1.6 }, { scale: 1.08, duration: 0.6, ease: ease.camera }, 0.1)
         .fromTo(q("[data-edge]"), { opacity: 0 }, { opacity: 1, duration: 0.2 }, 0.6)

@@ -4,7 +4,7 @@
   gap: 2.5rem;
   max-width: 40rem;
   margin-inline: auto;
-  background: radial-gradient(120% 60% at 50% 0%, rgb(21 29 59 / 0.6), transparent 70%);
+  background: radial-gradient(120% 60% at 50% 0%, rgb(var(--shade-rgb) / 0.6), transparent 70%);
 }
 
 .header {

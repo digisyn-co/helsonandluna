@@ -22,9 +22,9 @@ export function Beginning() {
 
   useChapterTimeline("beginning", root, {
     // Flow clip: the camera passes through a gold ring into the garden sky.
-    onProgress: (t) => t > 0.02 && clip.current?.play(),
+    onProgress: (t) => t >= 0 && clip.current?.play(),
     scrub: (tl, q) => {
-      tl.fromTo(q("[data-ring]"), { drawSVG: "50% 50%" }, { drawSVG: "0% 100%", duration: 0.25, ease: ease.camera }, 0)
+      tl.fromTo(q("[data-ring]"), { drawSVG: "20% 80%" }, { drawSVG: "0% 100%", duration: 0.2, ease: ease.camera }, 0)
         // Aperture opens: the circle grows past the screen edge as we move through it.
         .fromTo(q("[data-ring-wrap]"), { scale: 0.32 }, { scale: 3.2, duration: 0.55, ease: "power2.in" }, 0.2)
         .fromTo(q("[data-ring-wrap]"), { opacity: 1 }, { opacity: 0, duration: 0.12 }, 0.63)
@@ -32,7 +32,7 @@ export function Beginning() {
         .fromTo(q("[data-photo]"), { scale: 1.35, filter: "blur(10px)" }, { scale: 1.05, filter: "blur(0px)", duration: 0.6, ease: ease.camera }, 0.25)
         .fromTo(q("[data-haze]"), { opacity: 0.9 }, { opacity: 0.25, duration: 0.5 }, 0.3)
         .to(q("[data-photo]"), { scale: 1, yPercent: -3, duration: 0.25 }, 0.85)
-        .fromTo(q("[data-clip-wrap]"), { opacity: 0 }, { opacity: 1, duration: 0.08 }, 0)
+        .fromTo(q("[data-clip-wrap]"), { opacity: 1 }, { opacity: 1, duration: 0.01 }, 0)
         .to(q("[data-clip-wrap]"), { opacity: 0, duration: 0.14 }, 0.5);
     },
     revealAt: 0.62,

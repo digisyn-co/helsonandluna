@@ -7,6 +7,7 @@
  *   pnpm dev            # in another terminal
  *   node scripts/qa-screenshots.mjs [url] [outDir]
  *   QA_FRAMES="beginning:0.2,promise:0.8" QA_VIEWPORTS=390x844 node scripts/qa-screenshots.mjs "http://localhost:3200/?tier=medium" docs/qa/clips
+ *   QA_SWEEP=0.5 QA_VIEWPORTS=390x844 node scripts/qa-screenshots.mjs URL outDir   # a frame every half screen, top to bottom
  *
  * Output: docs/qa/<viewport>-<scene>.png (default)
  */
@@ -22,7 +23,7 @@ const PORT = 9333;
 
 // [scene id, pinned progress 0..1 at which the chapter is fully composed]
 const SCENES = [
-  ["invitation", 0], ["beginning", 0.95], ["two-of-us", 0.9], ["promise", 0.66], ["family", 0.97],
+  ["invitation", 0], ["beginning", 0.95], ["two-of-us", 0.9], ["family", 0.97], ["promise", 0.66],
   ["entourage", 0], ["ceremony", 0.7], ["celebration", 0.75], ["details", 0], ["closing", 1],
 ];
 // Optional custom frames: QA_FRAMES="scene:t,scene:t" (overrides the default composed frames).
@@ -90,11 +91,30 @@ async function main() {
     if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") errors.push(m.params.args.map((a) => a.value ?? a.description).join(" "));
   });
 
+  const SWEEP = Number(process.env.QA_SWEEP || 0);
   for (const vp of VIEWPORTS) {
     await send("Emulation.setDeviceMetricsOverride", { width: vp.width, height: vp.height, deviceScaleFactor: vp.mobile ? 2 : 1, mobile: vp.mobile });
     await send("Emulation.setTouchEmulationEnabled", { enabled: vp.mobile });
     await send("Page.navigate", { url: URL_ });
     await sleep(9000); // loader + opening sequence
+    if (SWEEP) {
+      const { result } = await send("Runtime.evaluate", { expression: "document.documentElement.scrollHeight - innerHeight", returnByValue: true });
+      const max = result.value;
+      const step = Math.round(vp.height * SWEEP);
+      for (let y = 0, k = 0; y <= max + step - 1; y += step, k++) {
+        const target = Math.min(y, max);
+        await send("Runtime.evaluate", {
+          awaitPromise: true,
+          expression: `(async () => { window.__lenis ? __lenis.scrollTo(${target}, { immediate: true }) : scrollTo(0, ${target}); await new Promise((r) => setTimeout(r, 1400)); })()`,
+        });
+        const { result: info } = await send("Runtime.evaluate", { expression: "document.querySelector('.progress__title')?.textContent", returnByValue: true });
+        const { data } = await send("Page.captureScreenshot", { format: "jpeg", quality: 60 });
+        const file = join(OUT, `${vp.name}-sweep-${String(k).padStart(3, "0")}.jpg`);
+        writeFileSync(file, Buffer.from(data, "base64"));
+        console.log("saved", file, "y=" + target, info.value);
+      }
+      continue;
+    }
     const frames = CUSTOM ? SCENES : vp.scenes.map((id) => SCENES.find((s) => s[0] === id));
     for (const [id, t] of frames) {
       await send("Runtime.evaluate", {

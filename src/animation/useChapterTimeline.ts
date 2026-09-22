@@ -3,8 +3,8 @@
 import { useRef, type RefObject } from "react";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { env } from "@/lib/device";
-import { sceneLength, type SceneId } from "@/content/scenes";
-import { pinProgress } from "./pin";
+import { fadeScreens, sceneLength, type SceneId } from "@/content/scenes";
+import { layerOpacity, pinProgress } from "./pin";
 import { showAll } from "./text";
 import { useScene } from "./useScene";
 
@@ -30,6 +30,7 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
   const scrub = useRef<gsap.core.Timeline | null>(null);
   const reveal = useRef<gsap.core.Timeline | null>(null);
   const length = sceneLength(id);
+  const fades = fadeScreens(id);
   const revealAt = build.revealAt ?? 0.3;
 
   useGSAP(
@@ -63,13 +64,27 @@ export function useChapterTimeline(id: SceneId, root: RefObject<HTMLElement | nu
     { scope: root },
   );
 
+  const layer = useRef<HTMLElement | null>(null);
+  const shown = useRef(-1);
+
   useScene(id, root, {
     progress: (p) => {
+      // Cross-dissolve the fixed chapter layer (pinned chapters only).
+      layer.current ??= root.current?.querySelector<HTMLElement>(":scope > .chapter__pin") ?? null;
+      const el = layer.current;
+      if (el) {
+        const o = Math.round(layerOpacity(p, length, fades.in, fades.out) * 1000) / 1000;
+        if (o !== shown.current) {
+          shown.current = o;
+          el.style.opacity = String(o);
+          el.style.visibility = o > 0 ? "visible" : "hidden";
+        }
+      }
       const t = pinProgress(p, length);
       if (!env.reducedMotion) scrub.current?.progress(t);
       const r = reveal.current;
       if (r && t >= revealAt && r.progress() === 0 && !r.isActive()) r.play();
-      build.onProgress?.(t);
+      if (p > 0) build.onProgress?.(t);
     },
   });
 }

@@ -64,20 +64,78 @@ textarea {
 }
 
 /* ---------- World layers ---------- */
+/* The artwork's paper: the chapter mood's periwinkle gradient + a warm blush cloud glow,
+   with the artwork's own marbled clouds laid over it (luminance only, so mood sets hue). */
 .sky {
   position: fixed;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(120% 70% at 50% 110%, color-mix(in srgb, var(--sky-bottom, var(--midnight-900)) 70%, var(--lavender) 8%), transparent 70%),
-    linear-gradient(180deg, var(--sky-top, var(--midnight-950)), var(--sky-bottom, var(--midnight-900)));
+    radial-gradient(90% 55% at 18% 12%, rgb(198 179 184 / 0.28), transparent 70%),
+    radial-gradient(80% 50% at 85% 95%, rgb(198 179 184 / 0.16), transparent 70%),
+    linear-gradient(180deg, var(--sky-top, #8b8ea8), var(--sky-bottom, #646987));
 }
+.sky::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/images/sky-clouds.webp") center / cover no-repeat;
+  mix-blend-mode: soft-light;
+  opacity: 0.85;
+}
+/* Soft paper vignette, as in the artwork's edges. */
+.sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(140% 100% at 50% 45%, transparent 60%, rgb(var(--shade-rgb) / 0.35));
+}
+
+/* The invitation card's gold hairline frame with corner flourishes (from the artwork). */
+.card-frame {
+  position: fixed;
+  inset: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid rgb(226 200 150 / 0.55);
+}
+.card-frame svg {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  color: rgb(236 214 170 / 0.9);
+}
+.card-frame .tl { top: 3px; left: 3px; }
+.card-frame .tr { top: 3px; right: 3px; transform: scaleX(-1); }
+.card-frame .bl { bottom: 3px; left: 3px; transform: scaleY(-1); }
+.card-frame .br { bottom: 3px; right: 3px; transform: scale(-1, -1); }
+.card-frame .mid {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: rgb(236 214 170 / 0.85);
+  transform: rotate(45deg);
+}
+.card-frame .ml { left: -5px; top: calc(50% - 4.5px); }
+.card-frame .mr { right: -5px; top: calc(50% - 4.5px); }
 
 .stage {
   position: fixed;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  animation: stage-in 1.6s var(--ease-out) both;
+}
+@keyframes stage-in {
+  from { opacity: 0; }
+}
+
+/* Without JavaScript, pinned chapters are ordinary visible blocks. */
+html:not([data-motion]) .chapter__pin {
+  position: sticky;
+  top: 0;
+  opacity: 1;
+  visibility: visible;
 }
 
 .story {
@@ -97,11 +155,15 @@ textarea {
   min-height: calc(var(--scene-h) * 1.8);
 }
 
+/* Pinned chapters: a fixed layer that cross-dissolves with its neighbours (opacity is
+   driven by useChapterTimeline). The section itself only provides scroll distance. */
 .chapter__pin {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0;
   height: var(--scene-h);
   overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
   display: grid;
   place-items: center;
   padding: calc(var(--safe-top) + 3rem) var(--gutter) calc(var(--safe-bottom) + 2rem);
@@ -124,8 +186,8 @@ html[data-motion="full"] [data-reveal] {
   font-size: var(--text-meta);
   letter-spacing: var(--tracking-meta);
   text-transform: uppercase;
-  font-weight: 400;
-  color: var(--gold-200);
+  font-weight: 500;
+  color: #fbf0da; /* champagne-ivory: readable at small sizes on periwinkle */
 }
 
 .display {
@@ -157,7 +219,7 @@ html[data-motion="full"] [data-reveal] {
 
 /* Copy set over photographs keeps a soft shadow for contrast. */
 .on-photo {
-  text-shadow: 0 1px 14px rgb(7 10 22 / 0.75), 0 0 2px rgb(7 10 22 / 0.4);
+  text-shadow: 0 1px 14px rgb(var(--shade-rgb) / 0.75), 0 0 2px rgb(var(--shade-rgb) / 0.4);
 }
 
 .gold-rule {
@@ -187,14 +249,14 @@ html[data-motion="full"] [data-reveal] {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(7 10 22 / 0.55)),
-    linear-gradient(180deg, rgb(58 71 117 / 0.36), rgb(12 18 39 / 0.4));
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(var(--shade-rgb) / 0.55)),
+    linear-gradient(180deg, rgb(122 127 156 / 0.22), rgb(var(--shade-rgb) / 0.4));
   mix-blend-mode: multiply;
 }
 .photo--framed {
   box-shadow:
     0 0 0 1px rgb(212 180 131 / 0.55),
-    0 0 0 7px rgb(7 10 22 / 0.35),
+    0 0 0 7px rgb(var(--shade-rgb) / 0.35),
     0 0 0 8px rgb(212 180 131 / 0.22),
     0 30px 80px rgb(0 0 0 / 0.45);
 }
@@ -217,7 +279,7 @@ html[data-motion="full"] [data-reveal] {
   position: relative;
   width: min(80vw, 480px);
   aspect-ratio: 931 / 822;
-  filter: drop-shadow(0 18px 40px rgb(7 10 22 / 0.45));
+  filter: drop-shadow(0 18px 40px rgb(var(--shade-rgb) / 0.45));
 }
 /* The artwork's own dusty blue becomes a soft light source behind it. */
 .monogram-halo {
@@ -312,7 +374,7 @@ html[data-motion="full"] [data-reveal] {
   right: 0;
   top: 0;
   height: calc(var(--safe-top) + 5.75rem);
-  background: linear-gradient(180deg, rgb(7 10 22 / 0.96) 0%, rgb(7 10 22 / 0.9) 50%, rgb(7 10 22 / 0.55) 75%, transparent 100%);
+  background: linear-gradient(180deg, rgb(var(--shade-rgb) / 0.96) 0%, rgb(var(--shade-rgb) / 0.9) 50%, rgb(var(--shade-rgb) / 0.55) 75%, transparent 100%);
   z-index: -1;
   pointer-events: none;
 }

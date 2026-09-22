@@ -40,7 +40,7 @@
 .cardBg {
   position: absolute;
   inset: -2rem calc(-1 * var(--gutter)) calc(-1 * var(--safe-bottom) - 2rem);
-  background: radial-gradient(90% 80% at 50% 100%, rgb(12 18 39 / 0.78), transparent 75%);
+  background: radial-gradient(90% 80% at 50% 100%, rgb(var(--shade-rgb) / 0.78), transparent 75%);
   z-index: -1;
   pointer-events: none;
 }

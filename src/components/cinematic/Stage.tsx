@@ -9,7 +9,7 @@ import { loadState } from "@/lib/loading";
 import { Atmosphere } from "./Atmosphere";
 
 // Per-scene 3D is code-split and mounted only while its chapter is near the viewport.
-const PromiseRings = lazy(() => import("@/scenes/03-promise/Rings"));
+const PromiseRings = lazy(() => import("@/scenes/04-promise/Rings"));
 
 
 /** A single scene failing must never break the page: drop to the static fallback. */

@@ -11,7 +11,7 @@ import s from "./promise.module.css";
 /**
  * 03 — The Promise (DOM layer). The rings themselves render in WebGL (Rings.tsx), mounted
  * by the Stage only while this chapter is near. Here: the words, and the exit — the
- * ring's reflection blooms until it fills the viewport and carries into Family.
+ * ring's reflection blooms until it fills the viewport and carries into the Entourage.
  * Without WebGL, the chapter still reads: title, caption and a warm light bloom.
  */
 export function ThePromise() {
@@ -19,7 +19,7 @@ export function ThePromise() {
   const clip = useRef<ClipHandle>(null);
 
   useChapterTimeline("promise", root, {
-    // Flow clip: a highlight travels the bands and blooms into golden bokeh → Family.
+    // Flow clip: a highlight travels the bands and blooms into golden bokeh → Entourage.
     onProgress: (t) => t > 0.68 && clip.current?.play(),
     scrub: (tl, q) => {
       tl.fromTo(q("[data-flare]"), { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "power2.in" }, 0.8)

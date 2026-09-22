@@ -61,7 +61,7 @@
   display: grid;
   gap: 0.9rem;
   padding: 0 var(--gutter) calc(var(--safe-bottom) + 2rem);
-  background: linear-gradient(180deg, transparent, rgb(7 10 22 / 0.7) 40%);
+  background: linear-gradient(180deg, transparent, rgb(var(--shade-rgb) / 0.7) 40%);
   padding-top: 3rem;
   width: 100%;
 }

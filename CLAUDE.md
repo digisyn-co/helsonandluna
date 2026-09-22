@@ -17,7 +17,10 @@ Mobile-first, scroll-driven 3D invitation. Next.js 16 (App Router) · React 19.2
 
 ## Architecture
 - `src/animation/sceneManager.ts` — the ONLY scroll reader. Scenes register via `useScene` / `useChapterTimeline` (scrub timeline + one-shot reveal). Timings in `animation/tokens.ts` + `styles/tokens.css`; per-chapter atmosphere in `animation/moods.ts`.
-- `src/scenes/NN-name/` — one folder per chapter. Chapter lengths (screens) in `content/scenes.ts`.
+- `src/scenes/NN-name/` — one folder per chapter; order, lengths (screens) and `flow` flags live in `content/scenes.ts`. Story order: Invitation → Beginning → Two of Us → Family → Promise → Entourage → Ceremony → Celebration → Details → Closing.
+- Pinned chapters are **fixed layers that cross-dissolve** (`layerOpacity` in `animation/pin.ts`, applied by `useChapterTimeline`); sections only provide scroll distance. `flow` chapters (Entourage, Details) scroll normally and their neighbours fade within a third of a screen of them. Every chapter's first frame (t=0) must be non-empty, because it is seen while dissolving in.
+- Theme = the artwork's paper: periwinkle moods (`animation/moods.ts`), the artwork's own cloud texture (`public/images/sky-clouds.webp`, luminance-only), gold `CardFrame`. Legibility shading uses `--shade-rgb` (deep periwinkle, never black).
+- The loader waits for fonts + monogram only, never for WebGL.
 - `src/components/cinematic/Stage.tsx` — one shared transparent canvas (haze + particles; per-scene 3D lazy-mounted near its chapter). Sky colour is CSS (`Sky.tsx`), so the no-WebGL fallback keeps the world.
 - DOM code must never import three (keeps it out of the initial bundle — verify after builds).
 - GSAP owns the transforms of animated elements: don't centre them with CSS `translate`/`transform`; use offsets or margins.
