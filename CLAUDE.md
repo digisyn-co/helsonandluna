@@ -27,4 +27,4 @@ Mobile-first, scroll-driven 3D invitation. Next.js 16 (App Router) · React 19.2
 - Type reveals split text only after `document.fonts.ready` and revert the split when done.
 
 ## Open items
-See `docs/content.md` → "Still open". Deployed at https://helsonandluna.vercel.app (Vercel project `helsonandluna`, auto-deploys from `digisyn-co/helsonandluna` main; `vercel.json` pins the Next.js preset). RSVPs go to a Google Sheet via Apps Script; see `integrations/rsvp-sheet/README.md`.
+See `docs/content.md` → "Still open". Deployed at https://helsonandluna.vercel.app (Vercel project `helsonandluna`, auto-deploys from `digisyn-co/helsonandluna` main; `vercel.json` pins the Next.js preset). RSVPs go to a Google Sheet via Apps Script; see `integrations/rsvp-sheet/README.md`. Hand-over notes: `docs/HANDOVER.md`.
