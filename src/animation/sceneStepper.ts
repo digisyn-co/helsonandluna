@@ -177,6 +177,7 @@ export function tickStepper() {
 
 let lastWheel = 0;
 let lastAbs = 0;
+let prevAbs = 0;
 
 function onWheel(e: WheelEvent) {
   if (e.ctrlKey) return; // pinch-zoom on trackpads
@@ -189,9 +190,12 @@ function onWheel(e: WheelEvent) {
   const dy = e.deltaY * unit;
   const abs = Math.abs(dy);
   const now = performance.now();
-  // New gesture = after a pause, or a clearly stronger flick during a decaying momentum tail.
-  const fresh = now - lastWheel > step.wheelGap || (abs > lastAbs * 1.6 && abs > 25);
+  // New gesture = after a pause, or a clearly stronger flick during a *decaying* momentum
+  // tail. A flick still ramping up (e.g. begun while locked) is never "new" mid-ramp.
+  const decaying = lastAbs <= prevAbs;
+  const fresh = now - lastWheel > step.wheelGap || (decaying && abs > lastAbs * 1.6 && abs > 25);
   lastWheel = now;
+  prevAbs = lastAbs;
   lastAbs = abs;
   const dir: 1 | -1 = dy > 0 ? 1 : -1;
   if (phase === "idle" && canScroll(scrollerOf(current), dir) && abs > 0) return; // read on, natively
