@@ -44,6 +44,7 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 
 ## Entourage (added 2026-09-22, from the couple's text.txt)
 Rendered from `src/content/entourage.ts`, shown before the Ceremony as "The Entourage".
+Order on the page (set by the couple, 2026-09-24): parents → **primary sponsors** → best man & maid of honor → bridesmaids/groomsmen → juniors → secondary sponsors → bearers.
 - **Parents of the Bride:** Alicia B Tenefrancia, Fernando T Tenefrancia
 - **Parents of the Groom:** Helen P Lamigo, Wilson A Lamigo
 - **Best Man:** John Lamigo. **Maid of Honor:** Ma Freda Tribunal

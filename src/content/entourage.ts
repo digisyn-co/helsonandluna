@@ -1,7 +1,8 @@
 /**
  * The Entourage — supplied by the couple (text.txt, 2026-09-22). Names are reproduced
  * exactly; only label typos were corrected and double spaces collapsed.
- * Primary sponsors keep the two columns and order given (no re-pairing).
+ * Primary sponsors keep the two columns and order given (no re-pairing). On the page they come
+ * right after the parents, before the best man and maid of honor (the couple, 2026-09-24).
  */
 export const entourage = {
   parents: [

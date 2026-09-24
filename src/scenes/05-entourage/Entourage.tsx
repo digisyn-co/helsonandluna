@@ -48,6 +48,23 @@ export function Entourage() {
 
       <Ornament className={s.ornament} />
 
+      <section className={s.block} aria-labelledby="primary-sponsors">
+        <h3 id="primary-sponsors" className="meta">
+          Primary Sponsors
+        </h3>
+        <div className={s.pair}>
+          {entourage.primarySponsors.map((col, i) => (
+            <ul key={i} className={s.column}>
+              {col.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </section>
+
+      <Ornament className={s.ornament} />
+
       <div className={s.pair}>
         {entourage.honor.map((g) => (
           <Role key={g.role} group={g} />
@@ -64,21 +81,6 @@ export function Entourage() {
       </div>
 
       <Ornament className={s.ornament} />
-
-      <section className={s.block} aria-labelledby="primary-sponsors">
-        <h3 id="primary-sponsors" className="meta">
-          Primary Sponsors
-        </h3>
-        <div className={s.pair}>
-          {entourage.primarySponsors.map((col, i) => (
-            <ul key={i} className={s.column}>
-              {col.map((n) => (
-                <li key={n}>{n}</li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </section>
 
       <section className={s.block} aria-labelledby="secondary-sponsors">
         <h3 id="secondary-sponsors" className="meta">
