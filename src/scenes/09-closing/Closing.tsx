@@ -67,7 +67,7 @@ export function Closing() {
           “{wedding.quote}”
         </p>
         <p className={`meta ${s.sign}`} data-sign data-reveal>
-          Garden Sky · {wedding.city}
+          {wedding.themeShort} · {wedding.city}
         </p>
       </div>
     </Chapter>

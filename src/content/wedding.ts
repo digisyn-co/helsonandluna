@@ -22,7 +22,10 @@ export const wedding = {
   dateNumeric: "17 · 12 · 26",
   city: "Iloilo City",
   country: "Philippines",
-  theme: "Ethereal of the Garden Sky",
+  /** Theme name (the couple, 2026-09-24: "Crystal Sky", previously "Garden Sky"). */
+  theme: "Ethereal of the Crystal Sky",
+  /** Short form, signed under the closing. */
+  themeShort: "Crystal Sky",
   quote: "And now, forever begins.",
 } as const;
 

@@ -10,7 +10,7 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 | Names (display order) | **HELSON & LUNA** (hero, closing: "HELSON + LUNA") | ⚠ Conflicts with the monogram artwork, which reads **"LUNA & HELSON"** (see Conflicts) |
 | Date | **Thursday, December 17, 2026** (also "17 · 12 · 26" and "DECEMBER 17 — 2026") | ✔ Weekday verified (Dec 17, 2026 is a Thursday). ⚠ The monogram artwork reads **"12·17·2024"** |
 | City | Iloilo City, Philippines | ✔ |
-| Theme line | "Ethereal of the Garden Sky" / "Garden Sky" / "Until the garden sky" | ✔ (copy as-is) |
+| Theme line | **"Ethereal of the Crystal Sky"**, signed "Crystal Sky · Iloilo City" under the closing | ✅ Changed from "Garden Sky" by the couple, 2026-09-24. Other "garden" wording (attire "Garden formal", the RSVP note's "seat in the garden", story copy) is unchanged |
 | Closing quote | "And now, forever begins." | ✔ |
 
 ## Ceremony
