@@ -109,3 +109,30 @@
   max-width: 32ch;
   margin-bottom: 0.75rem;
 }
+
+/* The couple's note about gifts — quiet, at the very end of the chapter. */
+.gifts {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+  width: 100%;
+  max-width: 34rem;
+  text-align: center;
+}
+.giftsBody {
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: var(--ivory-muted);
+}
+.giftsThanks {
+  font-size: var(--text-body);
+  color: var(--ivory-muted);
+}
+.giftsSign {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.35rem;
+  color: var(--gold-200);
+}

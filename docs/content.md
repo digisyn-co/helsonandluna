@@ -42,9 +42,16 @@ Extracted verbatim from the live site (https://helson-and-luna.vercel.app/, byte
 | Contact | "Questions? Write to us anytime." (same mailto) | ❌ Same broken address. `TODO(content)` |
 | Countdown | Live days / hours / minutes / seconds, targeting **`2026-12-17T14:30:00+08:00`** (2:30 PM Manila, the ceremony start) | ✅ Confirmed 2026-09-22 (the previous site used 2:00 PM) |
 
+## Gifts note (added 2026-09-29, the couple's words — verbatim)
+Shown at the end of The Details, after the RSVP form. Renders from `src/content/wedding.ts` → `gifts`.
+> **A little note about gifts**
+> Your presence is the greatest gift we could ask for. / If you wish to bless us with a gift, / we kindly prefer monetary gifts, / as we will be travelling back to Perth after our wedding.
+> Thank you for your love, generosity, and understanding. 🤍
+> — Luna & Helson
+
 ## Entourage (added 2026-09-22, from the couple's text.txt)
 Rendered from `src/content/entourage.ts`, shown before the Ceremony as "The Entourage".
-Order on the page (set by the couple, 2026-09-24): parents → **primary sponsors** → best man & maid of honor → bridesmaids/groomsmen → juniors → secondary sponsors → bearers.
+Order on the page (set by the couple, 2026-09-24/29): "With the blessing of" + parents → the **"The Entourage"** title → **primary sponsors** → best man & maid of honor → bridesmaids/groomsmen → juniors → secondary sponsors → bearers.
 - **Parents of the Bride:** Alicia B Tenefrancia, Fernando T Tenefrancia
 - **Parents of the Groom:** Helen P Lamigo, Wilson A Lamigo
 - **Best Man:** John Lamigo. **Maid of Honor:** Ma Freda Tribunal

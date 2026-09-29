@@ -61,6 +61,19 @@ export const details = {
   rsvpNote: "Kindly respond by October 31, 2026 so we can hold a seat for you in the garden.",
 } as const;
 
+/** The couple's note about gifts, shown at the end of The Details (their words, 2026-09-29). */
+export const gifts = {
+  title: "A little note about gifts",
+  lines: [
+    "Your presence is the greatest gift we could ask for.",
+    "If you wish to bless us with a gift,",
+    "we kindly prefer monetary gifts,",
+    "as we will be travelling back to Perth after our wedding.",
+  ],
+  thanks: "Thank you for your love, generosity, and understanding. 🤍",
+  sign: "Luna & Helson",
+} as const;
+
 export const story = {
   beginning: {
     title: ["Two lives.", "One beautiful story."],

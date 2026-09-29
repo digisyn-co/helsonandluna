@@ -33,11 +33,10 @@ export function Entourage() {
 
   return (
     <Chapter ref={root} id="entourage" label="The entourage" pinned={false} pinClassName={s.flow}>
+      {/* "With the blessing of" belongs to the parents; the title introduces the entourage
+          itself, which starts at the primary sponsors (the couple, 2026-09-29). */}
       <header className={s.header}>
         <p className="meta">With the blessing of</p>
-        <h2 className={`display ${s.title}`}>
-          The <em>Entourage</em>
-        </h2>
       </header>
 
       <div className={s.pair}>
@@ -47,6 +46,10 @@ export function Entourage() {
       </div>
 
       <Ornament className={s.ornament} />
+
+      <h2 className={`display ${s.title}`}>
+        The <em>Entourage</em>
+      </h2>
 
       <section className={s.block} aria-labelledby="primary-sponsors">
         <h3 id="primary-sponsors" className="meta">

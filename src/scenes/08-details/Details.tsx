@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ceremony, details, reception, story, wedding } from "@/content/wedding";
+import { ceremony, details, gifts, reception, story, wedding } from "@/content/wedding";
 import { useScene } from "@/animation/useScene";
 import { Chapter } from "@/components/cinematic/Chapter";
 import { Ornament } from "@/components/cinematic/Ornament";
@@ -76,6 +76,21 @@ export function Details() {
         </h3>
         <p className={s.rsvpNote}>{details.rsvpNote}</p>
         <RSVPForm />
+      </section>
+
+      <Ornament className={s.ornament} />
+
+      <section className={s.gifts} aria-labelledby="gifts-title">
+        <h3 id="gifts-title" className="meta">
+          {gifts.title}
+        </h3>
+        <p className={s.giftsBody}>
+          {gifts.lines.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </p>
+        <p className={s.giftsThanks}>{gifts.thanks}</p>
+        <p className={s.giftsSign}>{gifts.sign}</p>
       </section>
     </Chapter>
   );
