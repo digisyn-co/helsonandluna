@@ -30,6 +30,7 @@ export const photos = {
   daughterLaughing: P("daughter-laughing", "A little girl laughing, holding her mother's hands", "portrait", "55% 32%"),
   familyLaughing: P("family-laughing", "The family laughing together on the rocks", "landscape", "55% 45%"),
   twirl: P("twirl", "A little girl twirling in a pink tulle dress", "portrait", "50% 50%"),
+  familyWalking: P("family-walking", "The three of them walking hand in hand down a sunlit trail", "portrait", "50% 50%"),
   familyBacklit: P("family-backlit", "The family standing under tall trees at golden hour", "portrait", "50% 78%"),
   // Real couple photos from the August site (digisyn-co/helsonandluna).
   coupleBeach: { name: "couple-beach", alt: "The couple laughing on a beach, one carrying the other piggyback", width: 1440, height: 1800, focus: "50% 22%" },

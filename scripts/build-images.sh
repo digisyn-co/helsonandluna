@@ -41,6 +41,12 @@ for entry in "${PHOTOS[@]}"; do
   export_one "$SRC/${entry#*:}" "${entry%%:*}"
 done
 
+# 01 The Beginning: the three of them walking the trail. Some of the empty sky is cropped off
+# the top so they sit mid-frame, clear of the copy (a phone shows the photo's full height).
+WALK="$(mktemp -d)/family-walking.jpg"
+magick "$SRC/AR403745.jpg" -auto-orient -gravity south -crop 100%x76% +repage "$WALK"
+export_one "$WALK" "family-walking"
+
 # Real couple photos from the August site (digisyn-co/helsonandluna), originals in docs/reference/august.
 export_one "$ROOT/docs/reference/august/couple-beach.jpg" "couple-beach"
 export_one "$ROOT/docs/reference/august/couple-coast.jpg" "couple-coast"
