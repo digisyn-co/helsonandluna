@@ -46,7 +46,7 @@ export function Beginning() {
   return (
     <Chapter ref={root} id="beginning" label="The beginning" pinClassName={s.pin}>
       <div className={s.aperture} data-aperture>
-        <Picture photo={photos.walkAway} className={`photo ${s.photo}`} sizes="100vw" />
+        <Picture photo={photos.familyKneeling} className={`photo ${s.photo}`} sizes="100vw" />
         <div className={s.haze} data-haze aria-hidden="true" />
       </div>
       <div className="clip" data-clip-wrap>

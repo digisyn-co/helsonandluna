@@ -49,5 +49,8 @@ html:not([data-motion]) .aperture {
   position: relative;
   display: grid;
   gap: 1.1rem;
-  padding: 0 var(--gutter) calc(var(--safe-bottom) + 2.5rem);
+  padding: 3.5rem var(--gutter) calc(var(--safe-bottom) + 2.5rem);
+  /* The chapter's haze fades as it settles, so the words carry their own shade: legible over
+     any part of the photograph (periwinkle, never black). */
+  background: linear-gradient(180deg, transparent, rgb(var(--shade-rgb) / 0.55) 42%, rgb(var(--shade-rgb) / 0.82));
 }

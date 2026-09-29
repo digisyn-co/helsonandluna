@@ -1,7 +1,8 @@
 /**
  * The Entourage — supplied by the couple (text.txt, 2026-09-22). Names are reproduced
  * exactly; only label typos were corrected and double spaces collapsed.
- * Primary sponsors keep the two columns and order given (no re-pairing). On the page they come
+ * Primary sponsors keep the order given; Glenda Amor and Meriam Lamigo were moved to the left
+ * column (the couple, 2026-09-29). On the page they come
  * right after the parents, before the best man and maid of honor (the couple, 2026-09-24).
  */
 export const entourage = {
@@ -20,8 +21,8 @@ export const entourage = {
     { role: "Junior Groomsmen", names: ["Nicholas Tenefrancia", "Azriel Jaxith Lamigo", "Marcus Yuri Tenefrancia"] },
   ],
   primarySponsors: [
-    ["Gina Lamigo Lucas", "Ma. Jeana Fontanillas", "Hilda Maquiling", "Romela Dupit", "Norma Elardo", "Mary Koh", "Minviluz Hojilla", "Josie Galvez"],
-    ["Ramon Lucas", "Nemesio Fontanillas", "Edwin Maquiling", "Arnold Dupit", "Philip Elardo", "Leo Elangos", "Nilo Hojilla", "Giovanne Galvez", "Glenda Amor", "Meriam Lamigo"],
+    ["Gina Lamigo Lucas", "Ma. Jeana Fontanillas", "Hilda Maquiling", "Romela Dupit", "Norma Elardo", "Mary Koh", "Minviluz Hojilla", "Josie Galvez", "Glenda Amor", "Meriam Lamigo"],
+    ["Ramon Lucas", "Nemesio Fontanillas", "Edwin Maquiling", "Arnold Dupit", "Philip Elardo", "Leo Elangos", "Nilo Hojilla", "Giovanne Galvez"],
   ],
   secondarySponsors: [
     { role: "Cord", names: ["Jay Van Tenefrancia & Giselle May Tenefrancia"] },

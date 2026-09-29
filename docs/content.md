@@ -52,9 +52,9 @@ Order on the page (set by the couple, 2026-09-24): parents → **primary sponsor
 - **Groomsmen:** Joseph Foong, Juan Paulo Tenefrancia, Sean Warquin Lamigo, Isaac Raymon Lucas
 - **Junior Bridesmaids:** Shatacia Quinn Sevilla, Cassie Kelly Infante
 - **Junior Groomsmen:** Nicholas Tenefrancia, Azriel Jaxith Lamigo, Marcus Yuri Tenefrancia
-- **Primary Sponsors** (two columns, order as supplied, not re-paired):
-  - Column 1: Gina Lamigo Lucas, Ma. Jeana Fontanillas, Hilda Maquiling, Romela Dupit, Norma Elardo, Mary Koh, Minviluz Hojilla, Josie Galvez
-  - Column 2: Ramon Lucas, Nemesio Fontanillas, Edwin Maquiling, Arnold Dupit, Philip Elardo, Leo Elangos, Nilo Hojilla, Giovanne Galvez, Glenda Amor, Meriam Lamigo
+- **Primary Sponsors** (two columns; Glenda Amor and Meriam Lamigo moved from column 2 to column 1 by the couple, 2026-09-29):
+  - Column 1: Gina Lamigo Lucas, Ma. Jeana Fontanillas, Hilda Maquiling, Romela Dupit, Norma Elardo, Mary Koh, Minviluz Hojilla, Josie Galvez, Glenda Amor, Meriam Lamigo
+  - Column 2: Ramon Lucas, Nemesio Fontanillas, Edwin Maquiling, Arnold Dupit, Philip Elardo, Leo Elangos, Nilo Hojilla, Giovanne Galvez
 - **Secondary Sponsors:** Cord, Jay Van Tenefrancia & Giselle May Tenefrancia · Candle, Kenn Raymir Tenefrancia & Krisanteen Maquiling · Veil, Herbert Gajo & Christine Joy Gajo
 - **Flower Girls:** Aislah Fayre Gajo, Kaelsley Ember Infante · **Ring Bearer:** Noah Tenefrancia · **Bible Bearer:** Christoffer Eli Gajo · **Coin Bearer:** Cirgel Juaquin Principe
 
