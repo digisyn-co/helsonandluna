@@ -55,6 +55,7 @@ Order on the page (set by the couple, 2026-09-24/29): "With the blessing of" + p
 - **Parents of the Bride:** Alicia B Tenefrancia, Fernando T Tenefrancia
 - **Parents of the Groom:** Helen P Lamigo, Wilson A Lamigo
 - **Best Man:** John Lamigo. **Maid of Honor:** Ma Freda Tribunal
+- **Mini Bride:** Lyannah Grant T. Lamigo (added 2026-09-30; shown centred under the best man and maid of honor)
 - **Bridesmaids:** Alyssa Nicole Tenefrancia, Brielle Alizel Tenefrancia, Ma. Angelica Lauron, Lizette Jane Lucas
 - **Groomsmen:** Joseph Foong, Juan Paulo Tenefrancia, Sean Warquin Lamigo, Isaac Raymon Lucas
 - **Junior Bridesmaids:** Shatacia Quinn Sevilla, Cassie Kelly Infante

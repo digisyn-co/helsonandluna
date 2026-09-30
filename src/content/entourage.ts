@@ -14,6 +14,8 @@ export const entourage = {
     { role: "Best Man", names: ["John Lamigo"] },
     { role: "Maid of Honor", names: ["Ma Freda Tribunal"] },
   ],
+  /** Stands on her own line, centred under the best man and maid of honor. */
+  mini: { role: "Mini Bride", names: ["Lyannah Grant T. Lamigo"] },
   party: [
     { role: "Bridesmaids", names: ["Alyssa Nicole Tenefrancia", "Brielle Alizel Tenefrancia", "Ma. Angelica Lauron", "Lizette Jane Lucas"] },
     { role: "Groomsmen", names: ["Joseph Foong", "Juan Paulo Tenefrancia", "Sean Warquin Lamigo", "Isaac Raymon Lucas"] },

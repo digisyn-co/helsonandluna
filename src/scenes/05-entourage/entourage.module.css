@@ -75,3 +75,10 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* A role that stands alone, centred across both columns (the mini bride). */
+.solo {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+}

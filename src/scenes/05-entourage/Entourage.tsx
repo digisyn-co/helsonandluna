@@ -74,6 +74,10 @@ export function Entourage() {
         ))}
       </div>
 
+      <div className={s.solo}>
+        <Role group={entourage.mini} />
+      </div>
+
       <div className={s.pair}>
         <Role group={bridesmaids} />
         <Role group={groomsmen} />
