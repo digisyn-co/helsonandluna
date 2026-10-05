@@ -5,6 +5,7 @@ import { env } from "@/lib/device";
 import { SCENES, isFlow, type SceneId } from "@/content/scenes";
 import { anyBusy, nudgeAll, sceneBox } from "./sceneManager";
 import { step } from "./tokens";
+import { cue, startOnFirstGesture } from "@/audio/ethereal";
 
 /**
  * The scene stepper — one scroll = one chapter. Nothing scrolls the page freely.
@@ -136,6 +137,7 @@ export function goTo(index: number, opts: GoOpts = {}) {
     pace = dir > 0 ? f : (x) => 1 - f(1 - x); // mirrored going back
   }
   const duration = opts.duration ?? (env.reducedMotion ? step.reduced : (paced ?? clamp(step.base + step.perScreen * screens, step.min, step.max)));
+  cue(i); // one bell per chapter change, tuned to the pad's current chord
   setPhase("moving");
   proxy.y = from;
   tween = gsap.to(proxy, {
@@ -157,6 +159,7 @@ const modalOpen = () => Boolean(document.querySelector("dialog[open]"));
 
 function request(dir: 1 | -1) {
   if (modalOpen()) return; // e.g. the thank-you page after an RSVP
+  startOnFirstGesture(); // a real gesture: the only moment a browser lets audio begin
   if (phase === "holding") nudgeAll();
   if (phase !== "idle") return;
   const next = current + dir;

@@ -4,6 +4,7 @@ import { CardFrame } from "@/components/cinematic/CardFrame";
 import { StageClient } from "@/components/cinematic/StageClient";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ProgressIndicator } from "@/components/ui/ProgressIndicator";
+import { SoundToggle } from "@/components/ui/SoundToggle";
 import { Invitation } from "@/scenes/00-invitation/Invitation";
 import { Beginning } from "@/scenes/01-beginning/Beginning";
 import { TwoOfUs } from "@/scenes/02-two-of-us/TwoOfUs";
@@ -27,6 +28,7 @@ export default function Home() {
       <StageClient />
       <CardFrame />
       <ProgressIndicator />
+      <SoundToggle />
       <main className="story">
         <Invitation />
         <Beginning />

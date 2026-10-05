@@ -32,6 +32,7 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 - Theme sampled from the invitation artwork (periwinkle tokens in `styles/tokens.css`, per-chapter `animation/moods.ts`, artwork cloud texture, `CardFrame` gold hairline).
 - RSVP success opens a full-screen thank-you page (`components/ui/ThankYou.tsx`, a modal `<dialog>`): the guest's name, a message for accepts/declines, and for accepts the date, time and venues from `src/content`. The stepper never moves the page while a dialog is open.
 - Android always uses the lite tier: no WebGL haze (the CSS sky carries the atmosphere), the canvas only near The Promise and drawn only during steps at 30 fps, standard-metal rings, no animated blurs or full-screen blend modes/filters, next chapter's images pre-decoded and ring shaders precompiled. On a weak-GPU stand-in this took rest from 22–46 fps to 60 and glides from 5–29 to ~15–45 fps. `QA_DEVICE=android QA_GL=soft node scripts/qa-stepping.mjs` reproduces it.
+- Sound: an ethereal pad and a bell on every chapter change, synthesised in the browser (`src/audio/ethereal.ts`) — no audio files, no licensing. Silent until a guest's first scroll; the speaker button bottom-right mutes it and the choice is remembered on their device. `node scripts/qa-sound.mjs` verifies it.
 - Loader waits only for fonts + monogram (4 s fail-safe), never WebGL. three.js is code-split; initial JS ≈ 222 KB gz.
 - Reduced motion: each chapter is one still composition (scrub frozen at 0.5, frozen blurs cleared, rings held at one lit pose), and chapters hand over in sequence instead of cross-dissolving so two chapters' text never overlaps.
 - Link preview: `src/app/opengraph-image.jpg` (1200×630, monogram + names, date, city), rebuilt by `pnpm og`. Absolute URL comes from Vercel's production domain (`metadataBase` in `layout.tsx`).
@@ -42,6 +43,7 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 | Task | How |
 |---|---|
 | Change a fact or name | Edit `src/content/*.ts` and `docs/content.md`, push to `main` |
+| Change the music | `src/audio/ethereal.ts`: `PROGRESSION` (chords), `CHORD_HOLD` (pace), master level in `start()`. For a recorded track instead, swap the pad for an `<audio>` element and keep the toggle |
 | Swap a photo | Source on the KINGSTON drive → `pnpm images` |
 | Change the link preview | Edit the text lines in `scripts/build-og.sh` → `pnpm og` |
 | Update Apps Script | Paste `Code.js`, save, Manage deployments → edit → New version (same URL) |
@@ -49,6 +51,6 @@ Form (`08-details`) → `POST /api/rsvp` (validate, honeypot) → Apps Script `/
 
 ## Known limitations and next steps
 - Not tested on physical iOS/Android devices (stepping, touch and reduced motion verified in headless Chrome only). On real phones, check: swipe feel, reading inside Entourage/Details, and the RSVP keyboard.
-- The Ceremony runs real drone footage of the church (`public/clips/church.mp4`, rebuilt by `scripts/build-church-clip.sh`). It carries the videographer's "ORIGSTUDIO2026" watermark: confirm usage rights or get a clean export. No music by design.
+- The Ceremony runs real drone footage of the church (`public/clips/church.mp4`, rebuilt by `scripts/build-church-clip.sh`). It carries the videographer's "ORIGSTUDIO2026" watermark: confirm usage rights or get a clean export. Sound is on by default from the first scroll (mutable, remembered).
 - Spline installed but unused (rings built in R3F).
 - Next: custom domain; "RSVP by" date once the couple confirms it.

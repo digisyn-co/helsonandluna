@@ -466,3 +466,32 @@ html[data-tier="low"] .photo::after {
 html[data-tier="low"] .monogram {
   filter: none;
 }
+
+/* ---------- Sound ---------- */
+.sound-toggle {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(var(--safe-bottom) + 0.5rem);
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(212 180 131 / 0.45);
+  border-radius: 999px;
+  background: rgb(var(--shade-rgb) / 0.45);
+  color: var(--gold-200);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.sound-toggle:focus-visible {
+  outline: 2px solid var(--gold-400);
+  outline-offset: 3px;
+}
+/* Lite tier (Android): no backdrop blur — it re-composites the frame behind it. */
+html[data-tier="low"] .sound-toggle {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgb(var(--shade-rgb) / 0.7);
+}
