@@ -3,53 +3,76 @@
 import { createStore } from "@/lib/store";
 
 /**
- * The invitation's sound: an ethereal pad and a soft bell on every chapter change, built with
- * the Web Audio API — no files to download, no seam in the loop, nothing to license.
+ * The invitation's sound: the couple's song, and a bell slide on every chapter change.
  *
- *  • A slow four-chord progression (A major, 7ths) breathes under the whole invitation: each
- *    chord holds ~16 s and cross-fades into the next, through a generated reverb.
+ *  • The song is "Married Life (Up) × Canon in D", a piano cover by Gerard Chua
+ *    (`public/audio/music.mp3`, trimmed and levelled for the background). It plays from the
+ *    guest's first gesture and loops, fading down and back up across the seam so the return
+ *    is not a jolt.
  *  • Every chapter change plays a bell slide — a harp glissando with chimes (Pixabay Content
- *    License), pitched down three semitones so its notes sit inside the pad's A major. Moving
- *    back up the invitation plays it reversed. If the file ever fails to load, a synthesised
- *    bell rings instead, tuned to the chord that is playing.
- *  • Nothing is created until a guest's first scroll (browsers only allow audio after a real
- *    gesture, and silence by default is the polite way round). A guest can mute at any time;
- *    the choice is remembered on their device.
+ *    License), in the song's C major. Travelling back up the invitation plays it reversed. If
+ *    that file fails to load, a synthesised bell rings instead.
+ *  • Sound is on for every guest, from the first gesture they make: a browser will not let
+ *    audio begin before one, so there is no earlier moment to take. The speaker button mutes
+ *    it, and only an explicit mute is remembered on their device.
  */
 
 const STORE_KEY = "hl-sound";
-const FADE_IN = 4; // s — the pad arrives slowly
+const FADE_IN = 3; // s — the song arrives, rather than starting
 const FADE_OUT = 1.2;
-const CHORD_HOLD = 16; // s per chord, with a long cross-fade
-const CHORD_FADE = 6;
+const MUSIC_LEVEL = 0.72;
+const SEAM = 2.2; // s — fade across the loop seam
 
-/** A major, four chords: Amaj7 → F#m7 → Dmaj7 → Esus2/6. Midi notes, low and open. */
-const PROGRESSION = [
-  [57, 61, 64, 68], // A3 C#4 E4 G#4
-  [54, 57, 61, 64], // F#3 A3 C#4 E4
-  [50, 54, 57, 61], // D3 F#3 A3 C#4
-  [52, 59, 61, 66], // E3 B3 C#4 F#4
-] as const;
+const MUSIC_URL = "/audio/music.mp3";
+const SLIDE_URL = "/audio/bell-slide.mp3";
 
-/** Bell pitches per chapter (one octave up from the chord's voices), in step order. */
-const BELL_STEPS = [0, 2, 1, 3, 2, 0, 3, 1, 2, 0] as const;
-
+/** The fallback bell's pitches, in the song's C major, in step order. */
+const BELL_NOTES = [72, 76, 79, 77, 76, 72, 81, 79, 76, 72] as const;
 const midi = (n: number) => 440 * Math.pow(2, (n - 69) / 12);
 
-/** `on`: the guest hears sound now. `available`: the engine has been started at least once. */
+/** `on`: the guest hears sound now. `started`: the engine has been started at least once. */
 export const soundState = createStore<{ on: boolean; started: boolean }>({ on: false, started: false });
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
-let padBus: GainNode | null = null;
+let musicGain: GainNode | null = null;
 let bellBus: GainNode | null = null;
+let music: HTMLAudioElement | null = null;
 let slide: AudioBuffer | null = null;
 let slideBack: AudioBuffer | null = null;
-let chordIndex = 0;
-let chordTimer = 0;
 let stopped = true;
 
-const SLIDE_URL = "/audio/bell-slide.mp3";
+const prefersOff = () => {
+  try {
+    return localStorage.getItem(STORE_KEY) === "off";
+  } catch {
+    return false;
+  }
+};
+const remember = (on: boolean) => {
+  try {
+    localStorage.setItem(STORE_KEY, on ? "on" : "off");
+  } catch {
+    /* private mode: this guest's choice simply isn't remembered */
+  }
+};
+
+/** A small generated hall, so the bell slide has somewhere to ring. */
+function makeReverb(ac: AudioContext) {
+  const seconds = 2.6;
+  const rate = ac.sampleRate;
+  const buffer = ac.createBuffer(2, Math.floor(rate * seconds), rate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buffer.getChannelData(ch);
+    for (let i = 0; i < data.length; i++) {
+      const t = i / data.length;
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.8) * 0.6;
+    }
+  }
+  const convolver = ac.createConvolver();
+  convolver.buffer = buffer;
+  return convolver;
+}
 
 /** Fetch the bell slide once. A failure is not fatal: `cue` falls back to the synthesised bell. */
 async function loadSlide(ac: AudioContext) {
@@ -69,79 +92,26 @@ async function loadSlide(ac: AudioContext) {
   }
 }
 
-const prefersOff = () => {
-  try {
-    return localStorage.getItem(STORE_KEY) === "off";
-  } catch {
-    return false;
-  }
-};
-const remember = (on: boolean) => {
-  try {
-    localStorage.setItem(STORE_KEY, on ? "on" : "off");
-  } catch {
-    /* private mode: this guest's choice simply isn't remembered */
-  }
-};
-
-/** A short, soft reverb tail built from decaying noise — the "ethereal" of it. */
-function makeReverb(ac: AudioContext) {
-  const seconds = 2.6;
-  const rate = ac.sampleRate;
-  const buffer = ac.createBuffer(2, Math.floor(rate * seconds), rate);
-  for (let ch = 0; ch < 2; ch++) {
-    const data = buffer.getChannelData(ch);
-    for (let i = 0; i < data.length; i++) {
-      const t = i / data.length;
-      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, 2.8) * 0.6;
-    }
-  }
-  const convolver = ac.createConvolver();
-  convolver.buffer = buffer;
-  return convolver;
-}
-
-/** One chord: each note as two slightly detuned voices, swelling in and out. */
-function playChord(notes: readonly number[], at: number) {
-  if (!ctx || !padBus) return;
-  const ac = ctx;
-  notes.forEach((note, i) => {
-    for (const detune of [-5, 5]) {
-      const osc = ac.createOscillator();
-      osc.type = i === 0 ? "sine" : "triangle";
-      osc.frequency.value = midi(note);
-      osc.detune.value = detune;
-
-      const tone = ac.createBiquadFilter();
-      tone.type = "lowpass";
-      tone.frequency.value = 900 + i * 180;
-      tone.Q.value = 0.4;
-
-      const gain = ac.createGain();
-      const level = (i === 0 ? 0.16 : 0.1) / notes.length;
-      gain.gain.setValueAtTime(0.0001, at);
-      gain.gain.exponentialRampToValueAtTime(level, at + CHORD_FADE);
-      gain.gain.setValueAtTime(level, at + CHORD_HOLD - CHORD_FADE * 0.5);
-      gain.gain.exponentialRampToValueAtTime(0.0001, at + CHORD_HOLD + CHORD_FADE * 0.5);
-
-      osc.connect(tone).connect(gain).connect(padBus!);
-      osc.start(at);
-      osc.stop(at + CHORD_HOLD + CHORD_FADE);
-    }
-  });
-}
-
-function scheduleChords() {
-  if (!ctx || stopped) return;
-  playChord(PROGRESSION[chordIndex % PROGRESSION.length], ctx.currentTime + 0.05);
-  chordIndex++;
-  chordTimer = window.setTimeout(scheduleChords, (CHORD_HOLD - CHORD_FADE * 0.5) * 1000);
-}
-
 /**
- * One bell for a chapter change: a struck tone with inharmonic partials and a long tail,
- * tuned to the chord that is playing. `step` is the chapter index, so the pitch travels.
+ * The song, routed through the graph so the toggle governs it. It loops, and because a piano
+ * piece does not end where it begins, the last couple of seconds fade down and the first fade
+ * back up.
  */
+function makeMusic(ac: AudioContext, out: GainNode) {
+  const el = new Audio(MUSIC_URL);
+  el.loop = true;
+  el.preload = "auto";
+  ac.createMediaElementSource(el).connect(out);
+  el.addEventListener("timeupdate", () => {
+    if (!musicGain || !ctx || !el.duration) return;
+    const left = el.duration - el.currentTime;
+    const seam = left < SEAM ? left / SEAM : Math.min(1, el.currentTime / SEAM);
+    musicGain.gain.setTargetAtTime(MUSIC_LEVEL * Math.max(0.12, seam), ctx.currentTime, 0.25);
+  });
+  return el;
+}
+
+/** One chapter change: the bell slide, running with the direction of travel. */
 export function cue(step: number, dir = 1) {
   if (!ctx || !bellBus || stopped || !soundState.get().on) return;
   const buf = dir < 0 ? slideBack : slide;
@@ -155,16 +125,13 @@ export function cue(step: number, dir = 1) {
   synthBell(step);
 }
 
-/** The fallback: partials of a small struck bell, tuned to the chord that is playing. */
+/** The fallback: partials of a small struck bell, in the song's key. */
 function synthBell(step: number) {
   if (!ctx || !bellBus) return;
   const ac = ctx;
-  const chord = PROGRESSION[Math.max(0, chordIndex - 1) % PROGRESSION.length];
-  const note = chord[BELL_STEPS[((step % BELL_STEPS.length) + BELL_STEPS.length) % BELL_STEPS.length] % chord.length] + 12;
-  const base = midi(note);
+  const base = midi(BELL_NOTES[((step % BELL_NOTES.length) + BELL_NOTES.length) % BELL_NOTES.length]);
   const at = ac.currentTime + 0.02;
 
-  // Partials of a small struck bell; the higher ones decay first.
   for (const [ratio, level, decay] of [
     [1, 0.5, 3.6],
     [2, 0.26, 2.4],
@@ -184,7 +151,6 @@ function synthBell(step: number) {
   }
 }
 
-/** Starts (or resumes) the sound. Must be called from a real user gesture. */
 export function start() {
   if (soundState.get().on) return;
   try {
@@ -196,32 +162,52 @@ export function start() {
       master.gain.value = 0.0001;
       const reverb = makeReverb(ctx);
       const wet = ctx.createGain();
-      wet.gain.value = 0.55;
-      padBus = ctx.createGain();
+      wet.gain.value = 0.3; // the song carries its own room; this is for the bell
+      musicGain = ctx.createGain();
+      musicGain.gain.value = MUSIC_LEVEL;
       bellBus = ctx.createGain();
-      bellBus.gain.value = 0.3; // the bell sits close to the pad, never startling
-      padBus.connect(master);
+      bellBus.gain.value = 0.32; // the slide sits with the piano, never over it
+      musicGain.connect(master);
       bellBus.connect(master);
-      padBus.connect(reverb);
       bellBus.connect(reverb);
       reverb.connect(wet).connect(master);
       master.connect(ctx.destination);
+      music = makeMusic(ctx, musicGain);
     }
     void ctx.resume();
-    void loadSlide(ctx); // the first chapter change may still use the bell below
+    void loadSlide(ctx); // the first chapter change may still use the bell above
     stopped = false;
-    master!.gain.cancelScheduledValues(ctx.currentTime);
-    master!.gain.setValueAtTime(Math.max(0.0001, master!.gain.value), ctx.currentTime);
-    master!.gain.exponentialRampToValueAtTime(0.85, ctx.currentTime + FADE_IN);
-    if (!chordTimer) scheduleChords();
     soundState.set({ on: true, started: true });
     remember(true);
+    playMusic();
+    master!.gain.cancelScheduledValues(ctx.currentTime);
+    master!.gain.setValueAtTime(0.0001, ctx.currentTime);
+    master!.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + FADE_IN);
   } catch {
-    /* no audio on this device: the invitation is unchanged */
+    /* no Web Audio here: the invitation is silent, and otherwise unchanged */
   }
 }
 
-/** Fades out and silences everything (the engine stays, so turning it back on is instant). */
+/**
+ * Ask the song to play. A browser may still refuse — `play()` only counts inside a gesture,
+ * and a stricter one (iOS with Low Power Mode, a tab restored from the background) can reject
+ * it anyway — so a refusal re-arms the listener and the guest's next touch tries again.
+ */
+function playMusic() {
+  void music?.play().catch(() => {
+    if (!soundState.get().on) return;
+    const retry = () => {
+      void music?.play().catch(() => {});
+      window.removeEventListener("pointerdown", retry);
+      window.removeEventListener("touchstart", retry);
+      window.removeEventListener("keydown", retry);
+    };
+    window.addEventListener("pointerdown", retry, { passive: true, once: true });
+    window.addEventListener("touchstart", retry, { passive: true, once: true });
+    window.addEventListener("keydown", retry, { once: true });
+  });
+}
+
 export function stop() {
   soundState.set({ on: false, started: soundState.get().started });
   remember(false);
@@ -232,26 +218,45 @@ export function stop() {
   window.setTimeout(() => {
     if (soundState.get().on) return; // turned back on meanwhile
     stopped = true;
-    window.clearTimeout(chordTimer);
-    chordTimer = 0;
+    music?.pause();
     void ctx?.suspend();
   }, FADE_OUT * 1000 + 100);
 }
 
 export const toggle = () => (soundState.get().on ? stop() : start());
 
-/** The first scroll starts the sound, unless this guest has muted it before. */
+/**
+ * Sound is on for everyone, so the only question is when a browser will allow it. This runs at
+ * the guest's first gesture — a touch, a scroll, a key — not only at a chapter change, so the
+ * song is playing as early as it possibly can.
+ */
 export function startOnFirstGesture() {
   if (prefersOff() || soundState.get().started) return;
   start();
 }
 
-/** Pause while the tab is in the background; resume when it comes back (if still on). */
+/** Listen for that first gesture anywhere on the page, then stop listening. */
+export function watchFirstGesture() {
+  const events = ["pointerdown", "touchstart", "keydown", "wheel"] as const;
+  const once = () => {
+    startOnFirstGesture();
+    if (soundState.get().started) off();
+  };
+  const off = () => events.forEach((e) => window.removeEventListener(e, once));
+  events.forEach((e) => window.addEventListener(e, once, { passive: true }));
+  return off;
+}
+
 export function watchVisibility() {
   const onChange = () => {
     if (!ctx || !soundState.get().on) return;
-    if (document.hidden) void ctx.suspend();
-    else void ctx.resume();
+    if (document.hidden) {
+      music?.pause();
+      void ctx.suspend();
+    } else {
+      void ctx.resume();
+      playMusic();
+    }
   };
   document.addEventListener("visibilitychange", onChange);
   return () => document.removeEventListener("visibilitychange", onChange);

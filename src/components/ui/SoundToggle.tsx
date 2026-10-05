@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { soundState, toggle, watchVisibility } from "@/audio/ethereal";
+import { soundState, toggle, watchFirstGesture, watchVisibility } from "@/audio/ethereal";
 
 /**
- * The guest's control over sound: a small speaker in the corner of the frame. The pad starts
- * on their first scroll (see sceneStepper) and this turns it off — or back on — at any time.
- * The choice is remembered on their device.
+ * The guest's control over sound: a small speaker in the corner of the frame. The song starts
+ * at their first gesture anywhere on the page — the earliest a browser allows — and this turns
+ * it off, or back on, at any time. The choice is remembered on their device.
  */
 export function SoundToggle() {
   const { on } = soundState.use();
   useEffect(() => watchVisibility(), []);
+  useEffect(() => watchFirstGesture(), []);
 
   return (
     <button

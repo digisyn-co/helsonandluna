@@ -5,10 +5,10 @@
  * AudioNode.connect before the page loads — the app has no test hooks in it) and measures what
  * a guest would actually hear:
  *   • silent until the first scroll
- *   • the pad fades in and holds a musical level (never clipping)
- *   • every chapter step rings a bell (a level spike above the pad)
+ *   • the song fades in and holds a musical level (never clipping)
+ *   • every chapter step plays the bell slide (a spike above the music, climbing in pitch)
  *   • the toggle mutes it, and the choice survives a reload
- *   • the strongest frequencies are the chord's notes (it is tonal, not noise)
+ *   • the strongest frequencies belong to the song's key (it is music, not noise)
  *
  *   pnpm dev   # in another terminal
  *   node scripts/qa-sound.mjs [url]
@@ -26,6 +26,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const chrome = spawn(CHROME, [
   "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "qa-sound-"))}`,
   "--no-first-run", "--no-default-browser-check", "--hide-scrollbars", "--mute-audio", // measured in-page, not played
+  // Synthetic touches do not count as interaction for <audio>.play(), though a real tap does.
+  // Without this the song could never start here; the app still only calls play() on a gesture,
+  // so "silent until the first scroll" below is still a real check.
+  "--autoplay-policy=no-user-gesture-required",
   "--use-angle=metal", "--enable-gpu", "about:blank",
 ], { stdio: "ignore" });
 
@@ -67,6 +71,38 @@ const TAP = `(() => {
     let sum = 0, peak = 0;
     for (const v of buf) { sum += v * v; peak = Math.max(peak, Math.abs(v)); }
     return { rms: Math.sqrt(sum / buf.length), peak };
+  };
+  // A handle on the song, so a check can hear the bell slide by itself. The app has no test
+  // hooks; this notes every media element that plays and can mute the song for a moment.
+  window.__media = [];
+  const play = HTMLMediaElement.prototype.play;
+  HTMLMediaElement.prototype.play = function (...args) {
+    if (!window.__media.includes(this)) window.__media.push(this);
+    return play.apply(this, args);
+  };
+  window.__song = () => window.__media.find((m) => (m.src || "").includes("music.mp3")) || null;
+  // Pause it, rather than mute it: through a MediaElementAudioSourceNode, Chrome keeps feeding
+  // the graph whatever the element's own muted flag says.
+  window.__hush = (on) => {
+    const song = window.__song();
+    if (!song) return false;
+    if (on) song.pause();
+    else void song.play().catch(() => {});
+    return true;
+  };
+  window.__band = (lo, hi) => {
+    const an = window.__analyser;
+    if (!an) return 0;
+    const bins = new Float32Array(an.frequencyBinCount);
+    an.getFloatFrequencyData(bins);
+    const hz = an.context.sampleRate / an.fftSize;
+    let sum = 0, n = 0;
+    bins.forEach((db, i) => {
+      const f = i * hz;
+      if (f < lo || f > hi) return;
+      sum += Math.pow(10, db / 20); n += 1;
+    });
+    return n ? sum / n : 0;
   };
   window.__centroid = () => {
     const an = window.__analyser;
@@ -181,21 +217,37 @@ async function main() {
   await waitIdle();
   await sleep(4000); // the fade is slow on purpose
   const pad = await level(2500);
-  check("the pad plays after the first scroll", pad.rms > 0.004, `rms ${pad.rms.toFixed(4)}`);
+  check("the song plays after the first gesture", pad.rms > 0.004, `rms ${pad.rms.toFixed(4)}`);
   check("never clips", pad.peak < 0.99, `peak ${pad.peak.toFixed(3)}`);
 
   // 3. It is tonal — the loudest frequencies are the chord's notes.
   const tones = await evaluate("window.__tones && window.__tones()");
-  const inChord = (tones ?? []).filter((t) => [110, 138.6, 164.8, 207.7, 220, 277.2, 329.6, 415.3, 146.8, 185, 92.5, 123.5].some((n) => Math.abs(t.hz - n) < 8));
-  check("the pad is tonal (chord notes are the loudest)", inChord.length >= 2, (tones ?? []).slice(0, 4).map((t) => `${t.hz}Hz`).join(" "));
+  // C major, as the song is: the pitches a piano actually plays across these octaves.
+  const SCALE = [65.4, 73.4, 82.4, 87.3, 98, 110, 123.5, 130.8, 146.8, 164.8, 174.6, 196, 220, 246.9, 261.6, 293.7, 329.6, 349.2, 392, 440, 493.9, 523.3, 587.3, 659.3, 698.5, 784, 880, 987.8];
+  const inKey = (tones ?? []).filter((t) => SCALE.some((n) => Math.abs(t.hz - n) < n * 0.03));
+  check("the music is in the song's key (C major)", inKey.length >= 3, (tones ?? []).slice(0, 4).map((t) => `${t.hz}Hz`).join(" "));
 
-  // 4. A bell rings on the next chapter step (a spike above the pad).
+  // 3b. The song file was really fetched, so this is the couple's music, not the fallback bell.
+  const got = await evaluate(
+    `performance.getEntriesByType("resource").filter((r) => r.name.includes("/audio/music.mp3")).length`,
+  );
+  check("the song file loads", got > 0, `${got} request(s)`);
+
+  // 4. The bell slide plays on each chapter step. The song is muted for a moment so the slide
+  // is heard by itself: a plain level spike is no good against a piano, which outpeaks it.
+  const hushed = await evaluate("window.__hush && window.__hush(true)");
+  await sleep(400); // the paused song takes a moment to leave the graph
   const quiet = await level(1200);
   const ring = (async () => level(2600))();
   await sleep(150);
   await swipe();
-  const peakWithBell = await ring;
-  check("a bell rings on each chapter change", peakWithBell.peak > quiet.peak * 1.3, `pad peak ${quiet.peak.toFixed(3)} → with bell ${peakWithBell.peak.toFixed(3)}`);
+  const withSlide = await ring;
+  await evaluate("window.__hush && window.__hush(false)");
+  check(
+    "the bell slide rings on each chapter change",
+    hushed === true && withSlide.peak > Math.max(0.01, quiet.peak * 3),
+    `without the song ${quiet.peak.toFixed(3)} → with the slide ${withSlide.peak.toFixed(3)}`,
+  );
   await waitIdle();
 
   // 4b. It is the bell *slide*: a harp glissando climbs, so the sound brightens as it plays.

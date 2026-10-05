@@ -99,10 +99,11 @@ Consecutive frames are near-duplicate bursts; "(alt)" rows are backups. Final se
 | `AR506301.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.1 MB | Father leaning to daughter, mother behind, playful | faces centre | 06 Celebration | crop x≈50% | — |
 | `AR506303.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.6 MB | Father, daughter, mother kneeling, laughing | faces centre | 06 Celebration (hero candidate) | crop x≈55% | energy lift |
 | `AR506307.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.2 MB | Family playful, laughing | faces centre-left | 06 (alt) | crop x≈45% | — |
-## Sound: the bell slide (added 2026-10-05)
+## Sound (added 2026-10-05)
 
 | File | Source | Licence | Web size | Notes |
 |---|---|---|---|---|
+| `public/audio/music.mp3` | "Married Life (Up) × Canon in D (Wedding Version)", piano cover by **Gerard Chua**, supplied by the couple | **Not cleared.** "Married Life" is Michael Giacchino / Disney·Pixar and still in copyright; this is also Gerard Chua's own recording. Pachelbel's Canon is public domain, the cover of it is not. `TODO(content)`: the couple should confirm they have permission, or keep it to a private/unlisted link | 2.4 MB | The invitation's music, on for every guest from their first gesture. Trimmed from 3:03 to 2:52 (11 s of silence at the head, the dead tail), levelled to −19.3 LUFS with −3.2 dBTP from an original that peaked at −0.8, 112 kbps stereo. Loops, fading down and back up across the seam |
 | `public/audio/bell-slide.mp3` | "Harp glissando with chimes" by **ShidenBeatsMusic** on Pixabay ([page](https://pixabay.com/sound-effects/musical-harp-glissando-with-chimes-sound-effect-128349/)) | **Pixabay Content License** — free for commercial use, no attribution required, redistribution as a standalone sound file not allowed | 25 KB | Plays on every chapter change, reversed when a guest scrolls back up. Trimmed to 2.05 s from the original 7.8 s and **pitched down three semitones** so its strongest notes (E, D, F#, B, A) sit inside the pad's A major — the original is C major and its F and C naturals clashed. Mono, 96 kbps. The pad and the fallback bell are still synthesised in `src/audio/ethereal.ts`; this is the only audio file |
 
 ## Transition clips: Google Flow (added 2026-09-22)
