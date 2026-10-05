@@ -28,8 +28,12 @@
   --text-meta: 0.72rem;      /* uppercase metadata */
   --text-body: 1rem;         /* never below 16px on phones */
   --text-lede: 1.125rem;
-  --text-h2: clamp(2.4rem, 11vw, 5.5rem);
-  --text-h1: clamp(3rem, 15vw, 8rem);
+  /* Display type follows the width, but never outgrows the height: a phone turned sideways is
+     844px wide and 390px tall, where a width-only scale set a 128px headline on a 390px screen
+     and pushed everything under it off the bottom. The height term only bites when a screen is
+     short — on phones upright and on desktops the width still decides. */
+  --text-h2: clamp(2.4rem, min(11vw, 14vh), 5.5rem);
+  --text-h1: clamp(3rem, min(15vw, 20vh), 8rem);
   --tracking-meta: 0.28em;
   --tracking-display: -0.01em;
   --leading-body: 1.65;

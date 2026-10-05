@@ -13,7 +13,7 @@
  *   QA_FIT_VIEWPORTS=598x834,768x1024 node scripts/qa-fit.mjs
  */
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -24,14 +24,27 @@ const URL_ = withFree(process.argv[2] ?? "http://localhost:3200/");
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PORT = 9379;
 // [chapter id, progress through its pin at which it is fully composed] — as qa-screenshots.mjs.
+// Every chapter, each measured at the points where its text has settled — not only the one
+// frame that composes best. A heading can fit at the end of a chapter and not in the middle.
 const SCENES = [
-  ["invitation", 0], ["beginning", 0.95], ["two-of-us", 0.9], ["family", 0.97], ["promise", 0.66],
-  ["ceremony", 0.7], ["celebration", 0.75], ["closing", 1],
-]; // entourage and details are flow chapters: they scroll inside themselves by design.
+  ["invitation", [0]],
+  ["beginning", [0.5, 0.95]],
+  ["two-of-us", [0.6, 0.9, 1]],
+  ["family", [0.6, 0.97]],
+  ["promise", [0.45, 0.66, 0.9]],
+  ["entourage", [0, 0.5, 1]],
+  ["ceremony", [0.5, 0.7, 1]],
+  ["celebration", [0.5, 0.75, 1]],
+  ["details", [0, 0.5, 1]],
+  ["closing", [0.6, 1]],
+];
 const SLACK = 2; // px — rounding, not a layout fault
 
 const ALL = [
+  { name: "320x568", width: 320, height: 568, mobile: true }, // the smallest phone still about
+  { name: "360x640", width: 360, height: 640, mobile: true }, // small Android
   { name: "390x844", width: 390, height: 844, mobile: true }, // iPhone 14
+  { name: "844x390", width: 844, height: 390, mobile: true }, // a phone on its side
   { name: "430x932", width: 430, height: 932, mobile: true }, // iPhone Pro Max
   { name: "598x834", width: 598, height: 834, mobile: false }, // split window / small tablet
   { name: "768x1024", width: 768, height: 1024, mobile: false }, // iPad portrait
@@ -70,35 +83,77 @@ const evaluate = async (expression) =>
  * chapter layer that is actually visible and reports anything sticking out past the edges.
  */
 const MEASURE = `(() => {
-  // Only pinned chapters: a "flow" chapter (the entourage list, the details) has its own
-  // scroller, so content below the fold there is the point, not a fault. The invitation is
-  // its own one-screen section with no pin layer, so it is measured directly.
+  // The chapter a guest is looking at: the pinned layer that is actually painted, or the
+  // invitation, which is its own one-screen section with no pin layer.
   const pins = [...document.querySelectorAll(".chapter__pin")];
-  const live =
-    pins.find((p) => {
-      const st = getComputedStyle(p);
-      return st.visibility !== "hidden" && Number(st.opacity) > 0.5;
-    }) ?? (scrollY < innerHeight * 0.5 ? document.getElementById("invitation") : null);
+  let live = pins.find((p) => {
+    const st = getComputedStyle(p);
+    return st.visibility !== "hidden" && Number(st.opacity) > 0.5;
+  });
+  // A flow chapter (the entourage list, the details) scrolls inside itself: its own box is
+  // what content must fit, and anything below that is reached by scrolling, not cut off.
+  if (!live) live = [...document.querySelectorAll(".chapter__scroll")].find((p) => {
+    const r = p.getBoundingClientRect();
+    return r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.5;
+  });
+  if (!live) live = scrollY < innerHeight * 0.5 ? document.getElementById("invitation") : null;
   if (!live) return { error: "no visible chapter" };
   const chapter = live.closest("section");
-  const box = live.getBoundingClientRect();
-  const pad = getComputedStyle(live);
-  const top = box.top + parseFloat(pad.paddingTop || 0);
-  const bottom = box.bottom - parseFloat(pad.paddingBottom || 0);
-  const parts = [...live.querySelectorAll("h1, h2, h3, p, figcaption, .meta, li, dd, dt, button, a")];
+
+  // Every box between an element and its chapter that crops what it holds. A scroller inside
+  // the chapter crops nothing a guest cannot reach — it just has to be scrolled to — so it
+  // only lifts the screen-edge test for that axis; hidden/clip is a real cut.
+  const cropsOf = (el) => {
+    const list = [];
+    let scrollsY = false;
+    let scrollsX = false;
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const st = getComputedStyle(p);
+      if (/auto|scroll/.test(st.overflowY)) scrollsY = true;
+      if (/auto|scroll/.test(st.overflowX)) scrollsX = true;
+      const hx = /hidden|clip/.test(st.overflowX);
+      const hy = /hidden|clip/.test(st.overflowY);
+      if (hx || hy) list.push({ r: p.getBoundingClientRect(), hx, hy });
+      if (p === live) break; // the page itself scrolls; that is not this chapter's business
+    }
+    return { list, scrollsY, scrollsX };
+  };
+
+  const parts = [...live.querySelectorAll("h1, h2, h3, h4, p, figcaption, .meta, li, dd, dt, button, a, time, address")];
   const out = [];
   for (const el of parts) {
     const r = el.getBoundingClientRect();
-    if (r.width < 1 || r.height < 1) continue;                       // not laid out
-    if (Number(getComputedStyle(el).opacity) === 0) continue;         // not revealed yet
+    if (r.width < 1 || r.height < 1) continue;                 // not laid out
+    const st = getComputedStyle(el);
+    if (Number(st.opacity) === 0 || st.visibility === "hidden") continue; // not revealed yet
     if (el.closest("[aria-hidden='true']")) continue;
-    const over = Math.max(0, r.bottom - Math.min(bottom, window.innerHeight)) + Math.max(0, Math.min(top, 0) - r.top);
-    const past = Math.max(0, r.bottom - window.innerHeight);
-    if (over > 0 || past > 0) {
+    if (!(el.textContent || "").trim()) continue;
+
+    // How far it is cut on each side, by the screen and by every cropping ancestor.
+    const crops = cropsOf(el);
+    const cut = {
+      top: crops.scrollsY ? 0 : Math.max(0, -r.top),
+      bottom: crops.scrollsY ? 0 : Math.max(0, r.bottom - innerHeight),
+      left: crops.scrollsX ? 0 : Math.max(0, -r.left),
+      right: crops.scrollsX ? 0 : Math.max(0, r.right - innerWidth),
+    };
+    for (const c of crops.list) {
+      if (c.hy) {
+        cut.top = Math.max(cut.top, c.r.top - r.top);
+        cut.bottom = Math.max(cut.bottom, r.bottom - c.r.bottom);
+      }
+      if (c.hx) {
+        cut.left = Math.max(cut.left, c.r.left - r.left);
+        cut.right = Math.max(cut.right, r.right - c.r.right);
+      }
+    }
+    const side = Object.entries(cut).sort((a, b) => b[1] - a[1])[0];
+    if (side[1] > 0) {
       out.push({
-        text: (el.textContent || "").trim().slice(0, 42),
+        text: (el.textContent || "").trim().slice(0, 40),
         tag: el.tagName.toLowerCase(),
-        over: Math.round(Math.max(over, past)),
+        side: side[0],
+        over: Math.round(side[1]),
       });
     }
   }
@@ -147,7 +202,7 @@ async function main() {
     await send("Page.navigate", { url: URL_ });
     await sleep(9000); // loader + opening sequence
 
-    for (const [id, t] of SCENES) {
+    for (const [id, stops] of SCENES) for (const t of stops) {
       await send("Runtime.evaluate", {
         awaitPromise: true,
         expression: `(async () => {
@@ -157,18 +212,44 @@ async function main() {
           await new Promise((r) => setTimeout(r, 3000));
         })()`,
       });
+      if (process.env.QA_FIT_DUMP === id) {
+        const dump = await evaluate(`(() => {
+          const sec = document.getElementById(${JSON.stringify(id)});
+          const walk = (el, depth) => {
+            const r = el.getBoundingClientRect();
+            const row = { d: depth, tag: el.tagName.toLowerCase(), cls: (typeof el.className === "string" ? el.className : "").split(" ").filter(Boolean).slice(0, 2).join("."), top: Math.round(r.top), h: Math.round(r.height) };
+            return depth > 2 || r.height < 2 ? [row] : [row, ...[...el.children].flatMap((c) => walk(c, depth + 1))];
+          };
+          return { vh: innerHeight, rows: walk(sec, 0) };
+        })()`);
+        console.log(`  dump ${id} @${t} (vh=${dump.vh}):`);
+        for (const r of dump.rows) console.log(`    ${"  ".repeat(r.d)}${r.tag}.${r.cls} top=${r.top} h=${r.h}`);
+      }
       const seen = await evaluate(MEASURE);
       if (seen?.error) fail(vp.name, id, seen.error);
       else for (const c of seen.clipped ?? []) {
-        if (c.over > SLACK) fail(vp.name, seen.chapter, `${c.tag} "${c.text}" ${c.over}px past the bottom`);
+        if (c.over > SLACK) fail(vp.name, `${seen.chapter} @${t}`, `${c.tag} "${c.text}" cut ${c.over}px at the ${c.side}`);
       }
     }
     console.log(`${results.some((r) => r.vp === vp.name) ? "FAIL" : "PASS"}  ${vp.name}`);
-    for (const r of results.filter((x) => x.vp === vp.name)) console.log(`        ${r.chapter}: ${r.detail}`);
+    const mine = results.filter((x) => x.vp === vp.name);
+    for (const r of mine.slice(0, 6)) console.log(`        ${r.chapter}: ${r.detail}`);
+    if (mine.length > 6) console.log(`        … and ${mine.length - 6} more`);
   }
 
   chrome.kill();
-  console.log(results.length ? `\n${results.length} clipped element(s)` : "\nNothing clipped");
+  const REPORT = process.env.QA_FIT_REPORT ?? "/tmp/qa-fit-report.txt";
+  writeFileSync(REPORT, results.map((r) => `${r.vp}  ${r.chapter}: ${r.detail}`).join("\n") + "\n");
+  if (results.length) {
+    const byChapter = {};
+    for (const r of results) {
+      const key = r.chapter.split(" @")[0];
+      byChapter[key] = (byChapter[key] ?? 0) + 1;
+    }
+    console.log("\nBy chapter:");
+    for (const [k, n] of Object.entries(byChapter).sort((a, b) => b[1] - a[1])) console.log(`  ${k}: ${n}`);
+    console.log(`\n${results.length} clipped element(s) — full list in ${REPORT}`);
+  } else console.log("\nNothing clipped");
   process.exit(results.length ? 1 : 0);
 }
 

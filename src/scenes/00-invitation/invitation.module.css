@@ -51,7 +51,7 @@ html:not([data-motion]) .ornament {
   pointer-events: none;
 }
 .florals svg {
-  width: clamp(64px, 18vw, 120px);
+  width: clamp(64px, min(18vw, 14vh), 120px);
   height: auto;
   opacity: 0;
 }
@@ -61,7 +61,7 @@ html:not([data-motion]) .florals svg {
 }
 
 .names {
-  font-size: clamp(2.6rem, 13vw, 5.6rem);
+  font-size: clamp(2.6rem, min(13vw, 17vh), 5.6rem);
   font-weight: 400;
   line-height: 1;
   text-align: center;
@@ -98,4 +98,24 @@ html:not([data-motion]) .florals svg {
   width: 1px;
   height: 36px;
   background: linear-gradient(var(--gold-400), transparent);
+}
+
+
+/* A phone turned sideways: 390px of height for a stack built for 844. The ornament and the
+   corner florals are decoration, so they give way first, then the spacing. */
+@media (max-height: 520px) {
+  .inner {
+    gap: 0.45rem;
+    padding: calc(var(--safe-top) + 0.5rem) var(--gutter) calc(var(--safe-bottom) + 1.25rem);
+  }
+  .ornament {
+    width: min(40vw, 170px);
+  }
+  .florals,
+  .cueLine {
+    display: none;
+  }
+  .mono {
+    margin-top: -0.2rem;
+  }
 }

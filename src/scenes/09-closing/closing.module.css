@@ -26,7 +26,7 @@ html[data-motion="reduced"] .ground {
   pointer-events: none;
 }
 .florals svg {
-  width: clamp(70px, 20vw, 130px);
+  width: clamp(70px, min(20vw, 15vh), 130px);
   height: auto;
 }
 
@@ -44,7 +44,7 @@ html[data-motion="full"] .mono {
   opacity: 0;
 }
 .names {
-  font-size: clamp(2.4rem, 12vw, 5rem);
+  font-size: clamp(2.4rem, min(12vw, 16vh), 5rem);
   line-height: 1;
   margin-top: 0.5rem;
 }
@@ -56,7 +56,7 @@ html[data-motion="full"] .mono {
 }
 .quote {
   margin-top: 1.2rem;
-  font-size: clamp(1.5rem, 6.5vw, 2.4rem);
+  font-size: clamp(1.5rem, min(6.5vw, 8vh), 2.4rem);
   font-style: italic;
   color: var(--ivory);
 }
@@ -69,4 +69,25 @@ html[data-motion="full"] .mono {
 .clip {
   -webkit-mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
   mask-image: radial-gradient(120% 90% at 50% 45%, #000 55%, transparent 100%);
+}
+
+
+/* A phone turned sideways: the closing stack is tall, so it tightens and the corner florals
+   step aside rather than crowd the names. */
+@media (max-height: 520px) {
+  .content {
+    gap: 0.4rem;
+  }
+  .names {
+    margin-top: 0.2rem;
+  }
+  .quote {
+    margin-top: 0.5rem;
+  }
+  .sign {
+    margin-top: 0.3rem;
+  }
+  .florals {
+    display: none;
+  }
 }
