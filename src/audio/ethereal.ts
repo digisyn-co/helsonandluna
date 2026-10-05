@@ -8,8 +8,10 @@ import { createStore } from "@/lib/store";
  *
  *  • A slow four-chord progression (A major, 7ths) breathes under the whole invitation: each
  *    chord holds ~16 s and cross-fades into the next, through a generated reverb.
- *  • Every scene step rings one bell, tuned to the chord that is playing, so the sound moves
- *    with the story instead of repeating one effect.
+ *  • Every chapter change plays a bell slide — a harp glissando with chimes (Pixabay Content
+ *    License), pitched down three semitones so its notes sit inside the pad's A major. Moving
+ *    back up the invitation plays it reversed. If the file ever fails to load, a synthesised
+ *    bell rings instead, tuned to the chord that is playing.
  *  • Nothing is created until a guest's first scroll (browsers only allow audio after a real
  *    gesture, and silence by default is the polite way round). A guest can mute at any time;
  *    the choice is remembered on their device.
@@ -41,9 +43,31 @@ let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
 let padBus: GainNode | null = null;
 let bellBus: GainNode | null = null;
+let slide: AudioBuffer | null = null;
+let slideBack: AudioBuffer | null = null;
 let chordIndex = 0;
 let chordTimer = 0;
 let stopped = true;
+
+const SLIDE_URL = "/audio/bell-slide.mp3";
+
+/** Fetch the bell slide once. A failure is not fatal: `cue` falls back to the synthesised bell. */
+async function loadSlide(ac: AudioContext) {
+  if (slide) return;
+  try {
+    const res = await fetch(SLIDE_URL);
+    if (!res.ok) return;
+    const buf = await ac.decodeAudioData(await res.arrayBuffer());
+    const back = ac.createBuffer(buf.numberOfChannels, buf.length, buf.sampleRate);
+    for (let c = 0; c < buf.numberOfChannels; c += 1) {
+      back.copyToChannel(Float32Array.from(buf.getChannelData(c)).reverse(), c);
+    }
+    slide = buf;
+    slideBack = back;
+  } catch {
+    /* no slide: the bell below still rings */
+  }
+}
 
 const prefersOff = () => {
   try {
@@ -118,8 +142,22 @@ function scheduleChords() {
  * One bell for a chapter change: a struck tone with inharmonic partials and a long tail,
  * tuned to the chord that is playing. `step` is the chapter index, so the pitch travels.
  */
-export function cue(step: number) {
+export function cue(step: number, dir = 1) {
   if (!ctx || !bellBus || stopped || !soundState.get().on) return;
+  const buf = dir < 0 ? slideBack : slide;
+  if (buf) {
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(bellBus);
+    src.start(ctx.currentTime + 0.02);
+    return;
+  }
+  synthBell(step);
+}
+
+/** The fallback: partials of a small struck bell, tuned to the chord that is playing. */
+function synthBell(step: number) {
+  if (!ctx || !bellBus) return;
   const ac = ctx;
   const chord = PROGRESSION[Math.max(0, chordIndex - 1) % PROGRESSION.length];
   const note = chord[BELL_STEPS[((step % BELL_STEPS.length) + BELL_STEPS.length) % BELL_STEPS.length] % chord.length] + 12;
@@ -170,6 +208,7 @@ export function start() {
       master.connect(ctx.destination);
     }
     void ctx.resume();
+    void loadSlide(ctx); // the first chapter change may still use the bell below
     stopped = false;
     master!.gain.cancelScheduledValues(ctx.currentTime);
     master!.gain.setValueAtTime(Math.max(0.0001, master!.gain.value), ctx.currentTime);

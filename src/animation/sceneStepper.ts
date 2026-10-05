@@ -137,7 +137,7 @@ export function goTo(index: number, opts: GoOpts = {}) {
     pace = dir > 0 ? f : (x) => 1 - f(1 - x); // mirrored going back
   }
   const duration = opts.duration ?? (env.reducedMotion ? step.reduced : (paced ?? clamp(step.base + step.perScreen * screens, step.min, step.max)));
-  cue(i); // one bell per chapter change, tuned to the pad's current chord
+  cue(i, dir); // the bell slide, running with the direction of travel
   setPhase("moving");
   proxy.y = from;
   tween = gsap.to(proxy, {

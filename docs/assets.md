@@ -99,6 +99,12 @@ Consecutive frames are near-duplicate bursts; "(alt)" rows are backups. Final se
 | `AR506301.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.1 MB | Father leaning to daughter, mother behind, playful | faces centre | 06 Celebration | crop x≈50% | — |
 | `AR506303.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.6 MB | Father, daughter, mother kneeling, laughing | faces centre | 06 Celebration (hero candidate) | crop x≈55% | energy lift |
 | `AR506307.jpg` | photo (JPEG, pro shoot) | 9504×6336 | 3:2 landscape | 7.2 MB | Family playful, laughing | faces centre-left | 06 (alt) | crop x≈45% | — |
+## Sound: the bell slide (added 2026-10-05)
+
+| File | Source | Licence | Web size | Notes |
+|---|---|---|---|---|
+| `public/audio/bell-slide.mp3` | "Harp glissando with chimes" by **ShidenBeatsMusic** on Pixabay ([page](https://pixabay.com/sound-effects/musical-harp-glissando-with-chimes-sound-effect-128349/)) | **Pixabay Content License** — free for commercial use, no attribution required, redistribution as a standalone sound file not allowed | 25 KB | Plays on every chapter change, reversed when a guest scrolls back up. Trimmed to 2.05 s from the original 7.8 s and **pitched down three semitones** so its strongest notes (E, D, F#, B, A) sit inside the pad's A major — the original is C major and its F and C naturals clashed. Mono, 96 kbps. The pad and the fallback bell are still synthesised in `src/audio/ethereal.ts`; this is the only audio file |
+
 ## Transition clips: Google Flow (added 2026-09-22)
 Generated in Google Flow with **Veo 3.1 Fast**: 720×1280, 8 s, 9:16, 20 credits each (80 total). Re-encoded for the web to 540×960 H.264, audio removed, faststart, with a WebP poster each. Files are in `public/clips/`.
 

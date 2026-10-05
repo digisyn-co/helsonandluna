@@ -68,6 +68,21 @@ const TAP = `(() => {
     for (const v of buf) { sum += v * v; peak = Math.max(peak, Math.abs(v)); }
     return { rms: Math.sqrt(sum / buf.length), peak };
   };
+  window.__centroid = () => {
+    const an = window.__analyser;
+    if (!an) return 0;
+    const bins = new Float32Array(an.frequencyBinCount);
+    an.getFloatFrequencyData(bins);
+    const hz = an.context.sampleRate / an.fftSize;
+    let num = 0, den = 0;
+    bins.forEach((db, i) => {
+      const f = i * hz;
+      if (f < 80 || f > 8000) return;
+      const mag = Math.pow(10, db / 20);
+      num += f * mag; den += mag;
+    });
+    return den ? num / den : 0;
+  };
   window.__tones = () => {
     const an = window.__analyser;
     if (!an) return [];
@@ -181,6 +196,28 @@ async function main() {
   await swipe();
   const peakWithBell = await ring;
   check("a bell rings on each chapter change", peakWithBell.peak > quiet.peak * 1.3, `pad peak ${quiet.peak.toFixed(3)} → with bell ${peakWithBell.peak.toFixed(3)}`);
+  await waitIdle();
+
+  // 4b. It is the bell *slide*: a harp glissando climbs, so the sound brightens as it plays.
+  // The synthesised fallback bell decays from its strike instead, and would fail this.
+  const sweep = (async () => {
+    const seen = [];
+    for (let i = 0; i < 14; i += 1) {
+      seen.push(await evaluate("window.__centroid && window.__centroid()"));
+      await sleep(90);
+    }
+    return seen.filter((v) => typeof v === "number" && v > 0);
+  })();
+  await sleep(120);
+  await swipe();
+  const curve = await sweep;
+  const early = Math.min(...curve.slice(0, 4));
+  const later = Math.max(...curve.slice(3));
+  check(
+    "the chapter change slides upward in pitch",
+    curve.length > 6 && later > early * 1.25,
+    `${Math.round(early)}Hz → ${Math.round(later)}Hz`,
+  );
   await waitIdle();
 
   // 5. The toggle mutes it.
