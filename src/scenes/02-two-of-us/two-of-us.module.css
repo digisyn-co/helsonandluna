@@ -1,5 +1,7 @@
 .pin {
-  grid-template-rows: 1fr auto;
+  /* minmax(0, …): the frame row may shrink, so a tall photo can never push the heading off
+     the bottom of the screen. */
+  grid-template-rows: minmax(0, 1fr) auto;
   align-items: center;
   justify-items: center;
   gap: 1.5rem;
@@ -20,7 +22,12 @@
 
 .figure {
   position: relative;
-  width: min(84vw, 480px);
+  /* The frame takes the room the heading leaves, not the other way round: it is as large as
+     4:5 allows at this width, but never taller than its row. A fixed width alone pushed the
+     heading below the fold on screens that are wide but not tall (tablets, split windows). */
+  height: min(calc(100% - 3.5rem), calc(min(84vw, 480px) * 1.25));
+  width: auto;
+  max-width: min(84vw, 480px);
   aspect-ratio: 4 / 5;
   margin-top: 2.5rem;
   display: grid;
@@ -85,7 +92,9 @@ html:not([data-motion]) .frame {
     padding-inline: 8vw;
   }
   .figure {
-    width: min(34vw, 460px);
+    /* room for the caption, which hangs below the frame */
+    height: min(calc(100% - 4.5rem), calc(min(34vw, 460px) * 1.25));
+    max-width: min(34vw, 460px);
     margin-top: 0;
     justify-self: end;
   }

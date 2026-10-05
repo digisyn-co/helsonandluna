@@ -14,7 +14,7 @@
  *   node scripts/qa-sound.mjs [url]
  */
 import { spawn } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -23,8 +23,11 @@ const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/M
 const PORT = 9377;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const profile = mkdtempSync(join(tmpdir(), "qa-"));
+// Chrome writes a full profile here each run; left behind they fill the disk.
+process.on("exit", () => { try { rmSync(profile, { recursive: true, force: true }); } catch {} });
 const chrome = spawn(CHROME, [
-  "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), "qa-sound-"))}`,
+  "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`,
   "--no-first-run", "--no-default-browser-check", "--hide-scrollbars", "--mute-audio", // measured in-page, not played
   // Synthetic touches do not count as interaction for <audio>.play(), though a real tap does.
   // Without this the song could never start here; the app still only calls play() on a gesture,
